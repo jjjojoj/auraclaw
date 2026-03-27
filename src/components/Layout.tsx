@@ -24,26 +24,26 @@ export function Layout({
   return (
     <div className="page-shell" style={{ "--accent-color": accent } as CSSProperties}>
       <header className="sticky top-0 z-40 -mx-4 bg-[color:var(--background)] sm:-mx-6 lg:-mx-8">
-        <div className="flex items-center justify-between border-b border-[color:var(--border)] px-4 py-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between border-b border-[color:var(--border)] px-4 py-5 sm:px-6 lg:px-8">
           <NavLink className="flex items-center gap-3" to="/">
             <div
-              className="flex h-7 w-7 items-center justify-center text-xs font-semibold text-white"
+              className="flex h-8 w-8 items-center justify-center text-sm font-bold text-white"
               style={{ backgroundColor: accent }}
             >
               A
             </div>
-            <span className="text-sm font-semibold tracking-[0.14em] text-[color:var(--foreground)] uppercase">AuraClaw</span>
+            <span className="text-base font-bold tracking-[0.14em] text-[color:var(--foreground)] uppercase">AuraClaw</span>
           </NavLink>
 
-          <nav className="hidden items-center gap-6 md:flex">
+          <nav className="hidden items-center gap-8 md:flex">
             {navItems.map((item) => (
               <NavLink
                 key={item.to}
                 to={item.to}
                 className={({ isActive }) =>
                   cn(
-                    "text-sm transition-colors text-[color:var(--muted-foreground)] hover:text-[color:var(--foreground)]",
-                    isActive && "font-medium text-[color:var(--foreground)]",
+                    "text-base py-2 transition-colors text-[color:var(--muted-foreground)] hover:text-[color:var(--foreground)]",
+                    isActive && "font-semibold text-[color:var(--foreground)]",
                   )
                 }
               >
@@ -54,7 +54,7 @@ export function Layout({
 
           <NavLink
             to="/starter-pack"
-            className="hidden text-sm font-medium text-[color:var(--foreground)] underline underline-offset-4 hover:opacity-60 md:block"
+            className="hidden rounded-md bg-[color:var(--primary)] px-5 py-2.5 text-base font-semibold text-[color:var(--primary-foreground)] transition-opacity hover:opacity-80 md:block"
           >
             开始培养 →
           </NavLink>
@@ -78,8 +78,8 @@ export function Layout({
                   onClick={() => setMobileOpen(false)}
                   className={({ isActive }) =>
                     cn(
-                      "rounded px-3 py-2 text-sm transition-colors text-[color:var(--muted-foreground)] hover:text-[color:var(--foreground)] hover:bg-[color:var(--panel-muted)]",
-                      isActive && "font-medium text-[color:var(--foreground)] bg-[color:var(--panel-muted)]",
+                      "rounded px-3 py-3 text-base transition-colors text-[color:var(--muted-foreground)] hover:text-[color:var(--foreground)] hover:bg-[color:var(--panel-muted)]",
+                      isActive && "font-semibold text-[color:var(--foreground)] bg-[color:var(--panel-muted)]",
                     )
                   }
                 >

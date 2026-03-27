@@ -26,13 +26,13 @@ export function TrackCard({ track, index = 0 }: TrackCardProps) {
             <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-[color:var(--muted-foreground)] mb-1.5">
               {track.name}
             </p>
-            <h3 className="font-serif text-lg leading-snug tracking-[-0.02em] text-[color:var(--foreground)] mb-2">
+            <h3 className="font-serif text-xl leading-snug tracking-[-0.02em] text-[color:var(--foreground)] mb-2">
               {track.summary}
             </h3>
           </div>
           <ArrowRight className="h-4 w-4 shrink-0 text-[color:var(--muted-foreground)] mt-1 group-hover:translate-x-0.5 transition-transform" />
         </div>
-        <p className="text-sm leading-6 text-[color:var(--muted-foreground)]">{track.heroNote}</p>
+        <p className="text-base leading-7 text-[color:var(--muted-foreground)]">{track.heroNote}</p>
       </div>
     </Link>
   );

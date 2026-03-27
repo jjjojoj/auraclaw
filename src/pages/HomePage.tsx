@@ -5,6 +5,7 @@ import { ProgressMap } from "@/components/ProgressMap";
 import { RecipeCard } from "@/components/RecipeCard";
 import { SectionHeading } from "@/components/SectionHeading";
 import { TrackCard } from "@/components/TrackCard";
+import { Button } from "@/components/ui/button";
 import { highlightedRecipeIds, recipes, tracks } from "@/data";
 
 const heroRecipeIds = ["C1", "E1", "D1"];
@@ -33,18 +34,12 @@ export function HomePage() {
             把别人已经验证的经验直接装进来。每个经验包都有验证清单——你能确认它真的跑通了。
           </p>
           <div className="mt-10 flex flex-wrap items-center gap-4">
-            <Link
-              to="/starter-pack"
-              className="inline-flex items-center gap-2 bg-[color:var(--foreground)] px-6 py-3 text-sm font-medium text-[color:var(--primary-foreground)] transition-opacity hover:opacity-80"
-            >
-              从 Starter Pack 开始 →
-            </Link>
-            <Link
-              to="#featured-packs"
-              className="text-sm text-[color:var(--muted-foreground)] underline underline-offset-4 hover:text-[color:var(--foreground)]"
-            >
-              先看 3 个经验包
-            </Link>
+            <Button asChild size="lg" variant="secondary" className="rounded-full px-7 text-sm font-semibold shadow-[0_1px_0_rgba(255,255,255,0.04)_inset]">
+              <Link to="/starter-pack">从 Starter Pack 开始 →</Link>
+            </Button>
+            <Button asChild size="lg" variant="outline" className="rounded-full px-7 text-sm font-semibold">
+              <Link to="#featured-packs">先看 3 个经验包</Link>
+            </Button>
           </div>
         </div>
 

@@ -35,24 +35,24 @@ export function RecipeCard({ recipe }: RecipeCardProps) {
         )}
       </div>
 
-      <h3 className="font-serif text-xl leading-snug tracking-[-0.02em] text-[color:var(--foreground)] mb-3">
+      <h3 className="font-serif text-2xl leading-snug tracking-[-0.02em] text-[color:var(--foreground)] mb-3">
         {recipe.title}
       </h3>
 
-      <p className="text-sm leading-7 text-[color:var(--muted-foreground)] mb-5 flex-1">
+      <p className="text-base leading-7 text-[color:var(--muted-foreground)] mb-5 flex-1">
         {recipe.promise}
       </p>
 
       <ul className="space-y-2 mb-6">
         {highlights.map((item) => (
-          <li key={item} className="flex gap-2.5 text-sm text-[color:var(--foreground)]">
+          <li key={item} className="flex gap-2.5 text-base text-[color:var(--foreground)]">
             <span className="mt-2.5 h-1 w-1 shrink-0 rounded-full bg-[color:var(--accent-color,var(--foreground))]" />
             <span>{item}</span>
           </li>
         ))}
       </ul>
 
-      <div className="flex items-center justify-between text-xs text-[color:var(--muted-foreground)] pt-4 border-t border-[color:var(--border)]">
+      <div className="flex items-center justify-between text-sm text-[color:var(--muted-foreground)] pt-4 border-t border-[color:var(--border)]">
         <span>{recipe.minutes} 分钟</span>
         <span className="flex items-center gap-1 font-medium text-[color:var(--foreground)] group-hover:gap-2 transition-all">
           查看经验包 <ArrowRight className="h-3.5 w-3.5" />

@@ -158,15 +158,15 @@ textarea {
   }
 
   .section-title {
-    @apply font-serif text-3xl tracking-[-0.02em] text-[color:var(--foreground)] sm:text-4xl;
+    @apply font-serif text-4xl tracking-[-0.02em] text-[color:var(--foreground)] sm:text-5xl;
   }
 
   .section-copy {
-    @apply mt-4 text-base leading-7 text-[color:var(--muted-foreground)];
+    @apply mt-4 text-lg leading-8 text-[color:var(--muted-foreground)];
   }
 
   .eyebrow {
-    @apply text-[11px] font-medium uppercase tracking-[0.22em] text-[color:var(--muted-foreground)];
+    @apply text-xs font-medium uppercase tracking-[0.22em] text-[color:var(--muted-foreground)];
   }
 
   .code-surface {
