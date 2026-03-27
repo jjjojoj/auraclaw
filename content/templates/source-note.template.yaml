@@ -1,0 +1,21 @@
+id: SRC-001
+title: ""
+site_name: ""
+source_url: ""
+content_type: tutorial
+board_fit:
+  - care
+summary: ""
+key_points:
+  - ""
+recommended_for:
+  - ""
+newbie_friendly: true
+needs_manual_review: true
+citation_mode: summary
+reuse_targets:
+  - homepage_gallery
+  - track_page
+  - recipe_page
+last_checked: 2026-03-22
+notes: ""

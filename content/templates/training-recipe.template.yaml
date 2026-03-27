@@ -1,0 +1,86 @@
+# AuraClaw training recipe template
+# Use this schema for all beginner-facing recipes.
+
+recipe:
+  id: "replace-with-slug"
+  title: "替换成训练配方标题"
+  track: "信息获取与整理"
+  target_roles:
+    - "产品经理"
+    - "运营"
+  target_goals:
+    - "替换成用户想要得到的结果"
+  promise: "替换成结果承诺"
+  estimated_minutes: 10
+  difficulty: "简单"
+  risk_level: "低"
+
+  prerequisites:
+    openclaw_version: ">= current-supported"
+    tools:
+      - "dashboard"
+    skills: []
+    accounts: []
+    permissions:
+      - "网络访问"
+    user_inputs:
+      - "替换成用户需要准备的资料"
+
+  setup_steps:
+    - "打开 OpenClaw dashboard"
+    - "复制下面的训练文本"
+    - "粘贴到 OpenClaw 并运行"
+
+  copy_block: |
+    你现在是我的任务训练助手。
+
+    目标:
+    - 替换成这次要完成的结果
+
+    输入材料:
+    - 替换成用户会提供的输入
+
+    输出要求:
+    - 替换成固定输出格式
+
+    执行要求:
+    - 如果信息不足，先明确指出缺什么
+    - 不要编造来源和结论
+    - 优先输出结构化内容
+
+    自检要求:
+    - 检查输出是否完整
+    - 检查格式是否统一
+    - 检查是否满足目标结果
+
+  test_case:
+    input: "替换成测试样例输入"
+    expected_output: "替换成预期输出描述"
+    pass_criteria:
+      - "替换成通过标准 1"
+      - "替换成通过标准 2"
+      - "替换成通过标准 3"
+
+  common_failures:
+    - issue: "输出太散"
+      fix: "缩小主题范围，并限制输出格式"
+    - issue: "信息不足"
+      fix: "补充输入材料，或把任务拆小"
+
+  failure_recovery:
+    - "先检查输入是否完整"
+    - "再检查权限和连接状态"
+    - "最后重跑测试样例"
+
+  rollback:
+    - "如果本配方只读，可标记为无需回滚"
+    - "如果有写入操作，补充恢复步骤"
+
+  metrics:
+    success_rate: 0
+    avg_completion_minutes: 0
+    reuse_rate_7d: 0
+
+  status: "draft"
+  owner: "AuraClaw"
+  last_verified_at: "2026-03-20"
