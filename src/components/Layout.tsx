@@ -1,7 +1,7 @@
 import type { CSSProperties, PropsWithChildren } from "react";
-import { ArrowUpRight, Sparkles } from "lucide-react";
+import { Menu, X } from "lucide-react";
+import { useState } from "react";
 import { NavLink } from "react-router-dom";
-import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 interface LayoutProps {
@@ -12,41 +12,38 @@ export function Layout({
   children,
   accent = "var(--care)",
 }: PropsWithChildren<LayoutProps>) {
+  const [mobileOpen, setMobileOpen] = useState(false);
+
   const navItems = [
     { to: "/", label: "首页" },
     { to: "/starter-pack", label: "Starter Pack" },
     { to: "/tracks/care", label: "四条路径" },
-    { to: "/about", label: "关于 AuraClaw" },
+    { to: "/about", label: "关于" },
   ];
 
   return (
     <div className="page-shell" style={{ "--accent-color": accent } as CSSProperties}>
-      <div className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[28rem] bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.8),transparent_52%)]" />
-
-      <header className="sticky top-4 z-40">
-        <div className="flex items-center justify-between rounded-full border border-[color:var(--border)] bg-white/78 px-3 py-3 shadow-[0_26px_64px_-42px_rgba(29,31,32,0.65)] backdrop-blur-xl sm:px-5">
+      <header className="sticky top-0 z-40 -mx-4 bg-[color:var(--background)] sm:-mx-6 lg:-mx-8">
+        <div className="flex items-center justify-between border-b border-[color:var(--border)] px-4 py-4 sm:px-6 lg:px-8">
           <NavLink className="flex items-center gap-3" to="/">
             <div
-              className="flex h-10 w-10 items-center justify-center rounded-full text-sm font-semibold text-white shadow-[0_16px_36px_-22px_rgba(29,31,32,0.72)]"
+              className="flex h-7 w-7 items-center justify-center text-xs font-semibold text-white"
               style={{ backgroundColor: accent }}
             >
               A
             </div>
-            <div className="hidden sm:block">
-              <p className="text-sm font-semibold tracking-[0.18em] text-[color:var(--foreground)] uppercase">AuraClaw</p>
-              <p className="text-xs text-[color:var(--muted-foreground)]">OpenClaw 经验进化平台</p>
-            </div>
+            <span className="text-sm font-semibold tracking-[0.14em] text-[color:var(--foreground)] uppercase">AuraClaw</span>
           </NavLink>
 
-          <nav className="hidden items-center gap-1 md:flex">
+          <nav className="hidden items-center gap-6 md:flex">
             {navItems.map((item) => (
               <NavLink
                 key={item.to}
                 to={item.to}
                 className={({ isActive }) =>
                   cn(
-                    "relative flex items-center px-4 py-[10px] text-sm font-medium text-[color:var(--muted-foreground)] transition-colors hover:text-[color:var(--foreground)] min-h-[44px]",
-                    isActive && "text-[color:var(--foreground)] after:absolute after:bottom-0 after:left-4 after:right-4 after:h-[2px] after:rounded-full after:bg-[color:var(--accent-color)]",
+                    "text-sm transition-colors text-[color:var(--muted-foreground)] hover:text-[color:var(--foreground)]",
+                    isActive && "font-medium text-[color:var(--foreground)]",
                   )
                 }
               >
@@ -55,23 +52,47 @@ export function Layout({
             ))}
           </nav>
 
-          <Button asChild size="sm" className="hidden sm:inline-flex">
-            <NavLink to="/starter-pack">
-              开始培养
-              <ArrowUpRight className="h-4 w-4" />
-            </NavLink>
-          </Button>
+          <NavLink
+            to="/starter-pack"
+            className="hidden text-sm font-medium text-[color:var(--foreground)] underline underline-offset-4 hover:opacity-60 md:block"
+          >
+            开始培养 →
+          </NavLink>
 
-          <Button asChild size="sm" className="sm:hidden">
-            <NavLink to="/starter-pack">
-              <Sparkles className="h-4 w-4" />
-            </NavLink>
-          </Button>
+          <button
+            className="flex h-8 w-8 items-center justify-center text-[color:var(--foreground)] md:hidden"
+            onClick={() => setMobileOpen(!mobileOpen)}
+            aria-label="菜单"
+          >
+            {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          </button>
         </div>
+
+        {mobileOpen && (
+          <div className="border-b border-[color:var(--border)] bg-[color:var(--background)] px-4 py-3 md:hidden">
+            <nav className="flex flex-col gap-1">
+              {navItems.map((item) => (
+                <NavLink
+                  key={item.to}
+                  to={item.to}
+                  onClick={() => setMobileOpen(false)}
+                  className={({ isActive }) =>
+                    cn(
+                      "rounded px-3 py-2 text-sm transition-colors text-[color:var(--muted-foreground)] hover:text-[color:var(--foreground)] hover:bg-[color:var(--panel-muted)]",
+                      isActive && "font-medium text-[color:var(--foreground)] bg-[color:var(--panel-muted)]",
+                    )
+                  }
+                >
+                  {item.label}
+                </NavLink>
+              ))}
+            </nav>
+          </div>
+        )}
       </header>
 
       <main className="flex flex-1 flex-col">
-        <div className="mt-8 flex flex-col gap-16 sm:mt-12 sm:gap-24">{children}</div>
+        <div className="flex flex-col gap-20 sm:gap-28">{children}</div>
       </main>
     </div>
   );

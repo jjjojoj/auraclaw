@@ -1,6 +1,5 @@
 import { CheckCircle2, Circle } from "lucide-react";
 import { Link } from "react-router-dom";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { recipes, tracks } from "@/data";
 import { useAllProgress } from "@/lib/useRecipeProgress";
 
@@ -14,61 +13,56 @@ export function ProgressMap() {
 
   return (
     <section className="section-space">
-      <div className="mb-6">
+      <div className="mb-8">
         <p className="eyebrow">Your Progress</p>
-        <h2 className="mt-2 font-serif text-2xl tracking-[-0.03em]">你的培养进度</h2>
+        <h2 className="mt-3 font-serif text-2xl tracking-[-0.02em]">你的培养进度</h2>
         {!hasAny && (
-          <p className="mt-1 text-sm text-[color:var(--muted-foreground)]">完成第一个经验包后，你的进化地图就会开始生长。</p>
+          <p className="mt-2 text-sm text-[color:var(--muted-foreground)]">完成第一个经验包后，你的进化地图就会开始生长。</p>
         )}
       </div>
-      <div className="grid gap-4 lg:grid-cols-2">
+
+      <div className="divide-y divide-[color:var(--border)]">
         {tracks.map((track) => {
           const trackRecipes = recipes.filter((r) => r.trackId === track.id);
           const doneCount = trackRecipes.filter((r) => completedIds.includes(r.id)).length;
           if (hasAny && doneCount === 0) return null;
+
           return (
-            <Card
-              key={track.id}
-              style={{ borderTop: `3px solid ${track.color}`, opacity: doneCount === 0 ? 0.45 : 1 }}
-              className={doneCount === 0 ? "border-dashed" : ""}
-            >
-              <CardHeader className="gap-1 pb-3">
-                <div className="flex items-center justify-between">
-                  <CardTitle className="text-base font-semibold">{track.name}</CardTitle>
-                  <span className="text-xs text-[color:var(--muted-foreground)]">
-                    {doneCount > 0 ? `${doneCount} / ${trackRecipes.length} 跑通` : `${trackRecipes.length} 个经验包待解锁`}
-                  </span>
+            <div key={track.id} className="py-5">
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-2.5">
+                  <span className="h-2 w-2 rounded-full" style={{ backgroundColor: track.color }} />
+                  <span className="text-sm font-medium text-[color:var(--foreground)]">{track.name}</span>
                 </div>
-              </CardHeader>
+                <span className="text-xs text-[color:var(--muted-foreground)]">
+                  {doneCount > 0 ? `${doneCount} / ${trackRecipes.length} 跑通` : `${trackRecipes.length} 个待解锁`}
+                </span>
+              </div>
+
               {doneCount > 0 && (
-                <CardContent>
-                  <ul className="space-y-2">
-                    {trackRecipes.map((recipe) => {
-                      const done = completedIds.includes(recipe.id);
-                      return (
-                        <li key={recipe.id}>
-                          <Link
-                            to={`/recipes/${recipe.slug}`}
-                            className="flex items-center gap-3 rounded-lg px-2 py-1.5 text-sm transition-colors hover:bg-[color:var(--panel-muted)]"
-                          >
-                            {done ? (
-                              <CheckCircle2 className="h-4 w-4 shrink-0" style={{ color: "var(--success)" }} />
-                            ) : (
-                              <Circle className="h-4 w-4 shrink-0 text-[color:var(--step-pending)]" />
-                            )}
-                            <span
-                              className={done ? "text-[color:var(--step-done)] line-through" : "text-[color:var(--foreground)]"}
-                            >
-                              {recipe.title}
-                            </span>
-                          </Link>
-                        </li>
-                      );
-                    })}
-                  </ul>
-                </CardContent>
+                <ul className="space-y-1.5 pl-4">
+                  {trackRecipes.map((recipe) => {
+                    const done = completedIds.includes(recipe.id);
+                    return (
+                      <li key={recipe.id}>
+                        <Link
+                          to={`/recipes/${recipe.slug}`}
+                          className="flex items-center gap-2.5 py-1 text-sm transition-colors hover:text-[color:var(--foreground)]"
+                          style={{ color: done ? "var(--step-done)" : "var(--muted-foreground)" }}
+                        >
+                          {done ? (
+                            <CheckCircle2 className="h-3.5 w-3.5 shrink-0" />
+                          ) : (
+                            <Circle className="h-3.5 w-3.5 shrink-0" />
+                          )}
+                          <span className={done ? "line-through" : ""}>{recipe.title}</span>
+                        </Link>
+                      </li>
+                    );
+                  })}
+                </ul>
               )}
-            </Card>
+            </div>
           );
         })}
       </div>
