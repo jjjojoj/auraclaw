@@ -1,16 +1,17 @@
 # AuraClaw Design System
 
-> 美学方向：有机进化系统（Organic Growth System）
-> 更新时间：2026-03-26
+> 美学方向：编辑杂志系统（Editorial Magazine System）
+> 更新时间：2026-03-27
 > 状态：当前唯一设计依据
+> 历史版本：v1（有机进化系）见文末对比
 
 ## 核心设计原则
 
-每次做设计决策时，问自己：**这个选择让 AuraClaw 看起来更像「培养台」还是「文档网站」？** 选前者。
+每次做设计决策时，问自己：**这个选择让 AuraClaw 看起来更像「精装手册」还是「工具目录」？** 选前者。
 
-AuraClaw 不是冷冰冰的工具，不是百科全书，而是一个**活的培养环境**。设计语言的每一个选择都应该传达：这个东西在生长，你的 OpenClaw 在进化。
+AuraClaw 是记录 AI 助手成长的精装手册，不是冷冰冰的工具目录。设计语言的每个选择都应该传达：这是一个有品位的、认真对待用户时间的平台。
 
-气质关键词：**暖、有机、可生长、可验证、不冷冰冰**
+气质关键词：**编辑、精准、高对比、有序、稀缺点色**
 
 ---
 
@@ -19,149 +20,143 @@ AuraClaw 不是冷冰冰的工具，不是百科全书，而是一个**活的培
 ### 基础色（CSS 变量，定义在 styles.css :root）
 
 ```css
-/* 背景系 */
---background:        #f3eee7;
---background-strong: #ebe2d5;
---foreground:        #1a1c1e;
---muted-foreground:  #5d605f;
---panel:             rgba(255, 251, 246, 0.84);
---panel-strong:      rgba(241, 233, 223, 0.86);
---panel-muted:       #efe5d8;
---border:            rgba(41, 43, 45, 0.12);
---ring:              rgba(125, 83, 31, 0.38);
---primary:           #1f2326;
---primary-strong:    #0e1011;
---primary-foreground:#f7f2ea;
---primary-soft:      rgba(125, 83, 31, 0.12);
+/* 表面色 */
+--background:        #fafaf9;  /* 接近纯白，不刺眼 */
+--background-strong: #f4f4f2;
+--foreground:        #0f0f0e;  /* 近黑，高对比 */
+--muted-foreground:  #6b6b68;
+--panel:             #ffffff;
+--panel-strong:      #f7f7f6;
+--panel-muted:       #f4f4f2;
 
-/* Track 色（四条培养路径的系统信号色） */
+/* 结构色 */
+--border:            rgba(15, 15, 14, 0.10);
+--border-strong:     rgba(15, 15, 14, 0.18);
+--ring:              rgba(15, 15, 14, 0.30);
+
+/* 主操作色 */
+--primary:           #0f0f0e;
+--primary-strong:    #000000;
+--primary-foreground:#fafaf9;
+--primary-soft:      rgba(15, 15, 14, 0.06);
+
+/* Track 色（四条培养路径的系统信号色，保持不变） */
 --care:      #d66d42;  /* 产后护理 — 橙棕 */
 --extension: #1f6b63;  /* 能力扩展 — 深绿 */
 --dialogue:  #5070a8;  /* 对话训练 — 蓝紫 */
 --opc:       #8d5f2c;  /* 一人公司 — 琥珀 */
 
-/* 状态色（Phase 3 步骤系统） */
---success:       #2d7d5a;
---success-soft:  rgba(45, 125, 90, 0.10);
---progress:      #c4873a;
---progress-soft: rgba(196, 135, 58, 0.12);
+/* 状态色 */
+--success:       #1a6641;
+--success-soft:  rgba(26, 102, 65, 0.08);
+--progress:      #b87333;
+--progress-soft: rgba(184, 115, 51, 0.10);
 
 /* 步骤系统色 */
---step-active:  #1a1c1e;
---step-done:    #2d7d5a;
---step-pending: #9a9c9b;
+--step-active:  #0f0f0e;
+--step-done:    #1a6641;
+--step-pending: #c4c4c1;
 ```
 
 ### Track 色使用规范
 
-Track 色不只是装饰色，是**系统信号色**：
+Track 色是**系统信号色**，不是装饰色：
 - RecipeCard 顶部 3px 细线：表示归属
-- Layout accent prop：当前页面的环境色
-- 步骤完成状态：用 `--success`，不用 Track 色
-- Badge variant="accent"：用当前页面 accent color
+- TrackPage / RecipePage 左侧 accent 竖线：环境感
+- 步骤圆点小色块：当前 Track 的标识
+- 不用于大面积填充背景
 
 ---
 
 ## 2. 字体系统
 
 ```css
---font-sans: "Manrope", "Avenir Next", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
---font-serif: "Iowan Old Style", "Baskerville", "Songti SC", "STSong", "Noto Serif SC", serif;
+--font-sans: "DM Sans", system-ui, -apple-system, sans-serif;
+--font-serif: "Fraunces", "Georgia", serif;
+```
+
+字体通过 Google Fonts 加载（在 index.html 中）：
+```html
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;1,9..144,300;1,9..144,400&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
 ```
 
 ### 使用规范
 
-| 用途 | 字体 | 尺寸 | 字重 | 行高 | 字间距 |
-|------|------|------|------|------|--------|
-| Hero H1 | serif | 5xl–7xl | normal | 1.04 | -0.05em |
-| Page H1 | serif | 4xl–5xl | normal | tight | -0.04em |
-| Section H2 | serif | 2xl–3xl | normal | snug | -0.03em |
-| 主要段落 | sans | base | normal | 8 | 默认 |
-| 卡片内容 | sans | sm | normal | 7 | 默认 |
-| 标签/元信息 | sans | xs | medium | 6 | 默认 |
-| 步骤编号 | sans | sm | semibold | — | tabular-nums |
+| 用途 | 字体 | 尺寸 | 字重 | 字间距 |
+|------|------|------|------|--------|
+| Hero H1 | Fraunces serif | 5xl–8xl | 400 | -0.03em |
+| Page H1 | Fraunces serif | 4xl–6xl | 400 | -0.03em |
+| Section H2 | Fraunces serif | 3xl–4xl | 400 | -0.02em |
+| Card title | Fraunces serif | xl–2xl | 400 | -0.02em |
+| Pull quote | Fraunces serif | 2xl–3xl | 400 italic | -0.02em |
+| Body | DM Sans | sm–base | 400 | 0 |
+| UI labels | DM Sans | xs–sm | 500–600 | 0 |
+| Eyebrow | DM Sans | 11px | 500 | 0.22em |
+| Code | monospace | xs–sm | 400 | 0 |
 
 ---
 
-## 3. 布局规范
+## 3. 形状系统
 
-### 页面容器
-```
-.page-shell: max-w-7xl, mx-auto, px-4/6/8, pt-5, pb-16
-.section-space: mt-16 sm:mt-24
-```
-
-### 任务流布局（RecipePage 专用，桌面端）
-```
-左栏（执行主线）: flex-[1.2]，bg-[--panel]，border，rounded-2xl，p-6
-右栏（参考信息）: flex-[0.8]，无背景
-栏间距: gap-8
-```
-
-### 卡片规范
-- 标准卡片：`rounded-2xl border border-[--border] bg-[--panel]`
-- Track 归属卡片：顶部加 `border-t-[3px] border-t-[color:var(--accent-color)]`
-- 悬停：`hover:-translate-y-0.5 transition-transform duration-150`
+| 元素 | 圆角 |
+|------|------|
+| Card | rounded-xl (12px) |
+| Button (default/outline) | rounded-md (6px) |
+| Badge | rounded-sm (4px) |
+| Input | rounded-md (6px) |
+| Code surface | rounded-md (6px) |
+| Full pill | rounded-full — 仅用于状态指示圆点 |
 
 ---
 
-## 4. 步骤组件规范
+## 4. 间距系统
 
-### 三种状态
+- Base unit: 4px
+- Section gap: `section-space` = `mt-20 sm:mt-28`
+- Page shell: `pt-0`（导航直接在顶部，Hero 内部有 `pt-16 sm:pt-24`）
+- Card padding: `p-6`（header）/ `px-6 pb-6`（content）
 
-**进行中（active）**
-```
-border border-[--foreground]
-bg-[--panel]
-left: 4px 色条，颜色为当前 Track accent
-text: --step-active
-编号圆圈: bg-[--foreground] text-white
-```
+---
 
-**已完成（done）**
-```
-border border-[--success]
-bg-[--success-soft]
-text: --step-done（降权）
-编号圆圈: bg-[--success] text-white，显示 ✓
-```
+## 5. 导航规范
 
-**未开始（pending）**
-```
-border border-[--border]
-bg-transparent
-text: --step-pending（灰色）
-编号圆圈: border border-[--border] text-[--step-pending]
-```
+全宽顶部导航，黑色底部 1px 线。
 
-### 进度指示器（RecipePage 顶部）
 ```
-4 步线性：准备 ── 执行 ── 验证 ── 完成
-当前步骤: Track accent 色 + font-semibold
-已完成步骤: --success 色
-未开始步骤: --step-pending 色
-连接线: 1px --border，已完成段变为 --success
+结构：logo左 | nav中 | CTA右
+背景：var(--background) 白色，无 blur
+底线：border-b border-[color:var(--border-strong)]
+active 状态：font-semibold text-foreground（加粗，无色线）
 ```
 
 ---
 
-## 5. 动效规范
+## 6. 卡片与表面规范
 
-**原则：最小化、有意义，不做装饰性动效。**
+```
+Card: rounded-xl border border-[--border] bg-[--panel] shadow-[0_2px_12px_0_rgba(15,15,14,0.06)]
+代替旧版: rounded-[28px] backdrop-blur-sm 大投影
+```
 
-| 场景 | 属性 | 时长 | 缓动 |
-|------|------|------|------|
-| 卡片悬停 | translateY(-2px) | 150ms | ease-out |
-| 步骤展开 | height | 200ms | ease-out |
-| 步骤完成 | border-color → success | 300ms | ease-out |
-| 进度条填充 | width | 400ms | ease-out |
-| 页面过渡 | opacity | 150ms | ease-in-out |
-
-不使用：bounce、spin（非 loading 场景）、循环动画、parallax。
+编辑风格常用「gap-px + 背景色」代替卡片网格：
+```html
+<div class="grid gap-px bg-[color:var(--border)] lg:grid-cols-3">
+  <RecipeCard />  <!-- bg-white 的卡片，间隔线由父级 gap-px 产生 -->
+</div>
+```
 
 ---
 
-## 6. 「已跑通」状态规范
+## 7. 动效规范
+
+- 持续时间：micro 50ms / short 100-150ms / medium 200ms
+- Easing：enter ease-out / exit ease-in
+- 允许：opacity hover、color transition、border transition
+- 禁止：translate 动画、旋转、循环动画、parallax
+
+---
+
+## 8. 「已跑通」状态规范
 
 **RecipeCard 右上角徽章**
 ```
@@ -174,33 +169,34 @@ text: --step-pending（灰色）
 **RecipePage 完成按钮**
 ```
 条件: 所有 validationSteps 已勾选
-样式: bg-[--success] text-white（替换原有 primary 样式）
+样式: style={{ background: "var(--success)", color: "#fff" }}
 内容: 标记为已跑通 ✓
-点击后: 按钮变为「已跑通 · {日期}」，不可再点击
+点击后: 显示「✓ 已跑通 · {日期}」文字
 ```
 
 ---
 
-## 7. 竞品对比定位
-
-| 产品 | 气质 | AuraClaw 差异化 |
-|------|------|----------------|
-| Smithery | 橙+灰，工具目录，开发者向 | 太冷，无情感浓度 |
-| Raycast | 深色极简，系统感强 | 太工程师，离普通用户远 |
-| Mintlify | 蓝绿+白，知识库感 | 太「文档网站」，没有培养感 |
-
-**AuraClaw 的稀缺位置：暖色系 + 有机感 + 进度/成长可见。**
-不要往深色走，不要往科技蓝走，这是核心差异化资产。
-
----
-
-## 8. QA 检查清单
+## 9. QA 检查清单
 
 每次 `/design-review` 时检查：
 - [ ] 新组件是否使用了 CSS 变量而非硬编码颜色
 - [ ] Track 色是否只通过 `--accent-color` 传入，而非直接写死
 - [ ] 步骤状态三种都有正确的视觉区分
 - [ ] 「已跑通」状态在 RecipeCard 和 RecipePage 都正确显示
-- [ ] 动效是否符合「最小化有意义」原则
-- [ ] 字体是否按规范分配（serif 标题，sans 正文）
-- [ ] 暖米色背景是否保持，没有引入白色或深色底色
+- [ ] 背景是否保持 `#fafaf9`，没有引入暖米色或深色底色
+- [ ] 字体是否按规范分配（Fraunces 标题，DM Sans 正文）
+- [ ] 圆角是否收敛（无 rounded-[28px] 或 rounded-2xl 以上）
+- [ ] 导航是否为全宽顶部，无 glassmorphism
+
+---
+
+## 历史对比：v1 有机进化系（2026-03-26）
+
+| 维度 | v1 有机进化系 | v2 编辑杂志系（当前） |
+|------|------------|--------------------|
+| 背景 | 暖米色 #f3eee7 | 近白 #fafaf9 |
+| 字体 | Iowan Old Style + Manrope | Fraunces + DM Sans |
+| 卡片 | rounded-[28px] + backdrop-blur | rounded-xl 轻投影 |
+| 导航 | 浮动 pill + glassmorphism | 全宽顶部细线 |
+| 按钮 | rounded-full pill | rounded-md 方形 |
+| 气质 | 暖、有机、培养感 | 编辑、精准、高对比 |
