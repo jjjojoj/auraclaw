@@ -2,6 +2,7 @@ import type { CSSProperties, PropsWithChildren } from "react";
 import { Menu, X } from "lucide-react";
 import { useState } from "react";
 import { NavLink } from "react-router-dom";
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 interface LayoutProps {
@@ -52,12 +53,9 @@ export function Layout({
             ))}
           </nav>
 
-          <NavLink
-            to="/starter-pack"
-            className="hidden rounded-md bg-[color:var(--primary)] px-5 py-2.5 text-base font-semibold text-[color:var(--primary-foreground)] transition-opacity hover:opacity-80 md:block"
-          >
-            开始培养 →
-          </NavLink>
+          <Button asChild variant="outline" size="sm" className="hidden md:inline-flex text-sm font-semibold">
+            <NavLink to="/starter-pack">开始培养 →</NavLink>
+          </Button>
 
           <button
             className="flex h-8 w-8 items-center justify-center text-[color:var(--foreground)] md:hidden"
