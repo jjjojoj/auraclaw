@@ -1,39 +1,47 @@
 @import "tailwindcss";
 
 @theme inline {
-  --font-sans: "Manrope", "Avenir Next", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
-  --font-serif: "Iowan Old Style", "Baskerville", "Songti SC", "STSong", "Noto Serif SC", serif;
+  --font-sans: "DM Sans", system-ui, -apple-system, sans-serif;
+  --font-serif: "Fraunces", "Georgia", serif;
 }
 
 :root {
-  --background: #f3eee7;
-  --background-strong: #ebe2d5;
-  --foreground: #1a1c1e;
-  --muted-foreground: #5d605f;
-  --panel: rgba(255, 251, 246, 0.84);
-  --panel-strong: rgba(241, 233, 223, 0.86);
-  --panel-muted: #efe5d8;
-  --border: rgba(41, 43, 45, 0.12);
-  --ring: rgba(125, 83, 31, 0.38);
-  --primary: #1f2326;
-  --primary-strong: #0e1011;
-  --primary-foreground: #f7f2ea;
-  --primary-soft: rgba(125, 83, 31, 0.12);
-  --care: #d66d42;
+  /* Surfaces */
+  --background:        #fafaf9;
+  --background-strong: #f4f4f2;
+  --foreground:        #0f0f0e;
+  --muted-foreground:  #6b6b68;
+  --panel:             #ffffff;
+  --panel-strong:      #f7f7f6;
+  --panel-muted:       #f4f4f2;
+
+  /* Structure */
+  --border:            rgba(15, 15, 14, 0.10);
+  --border-strong:     rgba(15, 15, 14, 0.18);
+  --ring:              rgba(15, 15, 14, 0.30);
+
+  /* Primary action */
+  --primary:           #0f0f0e;
+  --primary-strong:    #000000;
+  --primary-foreground:#fafaf9;
+  --primary-soft:      rgba(15, 15, 14, 0.06);
+
+  /* Track 色（保持原有系统信号色） */
+  --care:      #d66d42;
   --extension: #1f6b63;
-  --dialogue: #5070a8;
-  --opc: #8d5f2c;
+  --dialogue:  #5070a8;
+  --opc:       #8d5f2c;
 
   /* 状态色 */
-  --success: #2d7d5a;
-  --success-soft: rgba(45, 125, 90, 0.10);
-  --progress: #c4873a;
-  --progress-soft: rgba(196, 135, 58, 0.12);
+  --success:       #1a6641;
+  --success-soft:  rgba(26, 102, 65, 0.08);
+  --progress:      #b87333;
+  --progress-soft: rgba(184, 115, 51, 0.10);
 
   /* 步骤系统色 */
-  --step-active: #1a1c1e;
-  --step-done: #2d7d5a;
-  --step-pending: #9a9c9b;
+  --step-active:  #0f0f0e;
+  --step-done:    #1a6641;
+  --step-pending: #c4c4c1;
 }
 
 * {
@@ -47,10 +55,7 @@ html {
 body {
   margin: 0;
   min-width: 320px;
-  background:
-    radial-gradient(circle at top left, rgba(214, 109, 66, 0.12), transparent 24rem),
-    radial-gradient(circle at top right, rgba(31, 107, 99, 0.12), transparent 26rem),
-    linear-gradient(180deg, #f7f2ea 0%, #f3eee7 38%, #efe8dc 100%);
+  background: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
@@ -73,7 +78,7 @@ textarea {
 }
 
 ::selection {
-  background: rgba(214, 109, 66, 0.22);
+  background: rgba(15, 15, 14, 0.10);
 }
 
 @layer base {
@@ -92,11 +97,11 @@ textarea {
 
 @layer utilities {
   .page-shell {
-    @apply relative mx-auto flex min-h-screen w-full max-w-7xl flex-col px-4 pb-16 pt-5 sm:px-6 lg:px-8;
+    @apply relative mx-auto flex min-h-screen w-full max-w-7xl flex-col px-4 pb-20 pt-0 sm:px-6 lg:px-8;
   }
 
   .section-space {
-    @apply mt-16 sm:mt-24;
+    @apply mt-20 sm:mt-28;
   }
 
   .section-intro {
@@ -104,18 +109,18 @@ textarea {
   }
 
   .section-title {
-    @apply font-serif text-3xl tracking-[-0.03em] text-[color:var(--foreground)] sm:text-4xl;
+    @apply font-serif text-3xl tracking-[-0.02em] text-[color:var(--foreground)] sm:text-4xl;
   }
 
   .section-copy {
-    @apply mt-3 text-sm leading-7 text-[color:var(--muted-foreground)] sm:text-base;
+    @apply mt-4 text-base leading-7 text-[color:var(--muted-foreground)];
   }
 
   .eyebrow {
-    @apply text-[11px] font-semibold uppercase tracking-[0.28em] text-[color:var(--muted-foreground)];
+    @apply text-[11px] font-medium uppercase tracking-[0.22em] text-[color:var(--muted-foreground)];
   }
 
   .code-surface {
-    @apply rounded-[22px] border border-[color:var(--border)] bg-[#161819] p-5 text-sm leading-7 text-[#dff9f2] shadow-[inset_0_1px_0_rgba(255,255,255,0.05)];
+    @apply rounded-xl border border-[color:var(--border)] bg-[#0f0f0e] p-5 text-sm leading-7 text-[#e8f5f1] shadow-[inset_0_1px_0_rgba(255,255,255,0.04)];
   }
 }
