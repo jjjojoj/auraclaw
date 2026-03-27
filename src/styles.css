@@ -1,47 +1,86 @@
 @import "tailwindcss";
 
 @theme inline {
-  --font-sans: "DM Sans", system-ui, -apple-system, sans-serif;
-  --font-serif: "Fraunces", "Georgia", serif;
+  --font-sans: "DM Sans", "Noto Sans SC", system-ui, -apple-system, sans-serif;
+  --font-serif: "Space Grotesk", "Noto Sans SC", system-ui, sans-serif;
 }
 
 :root {
-  /* Surfaces */
-  --background:        #fafaf9;
-  --background-strong: #f4f4f2;
-  --foreground:        #0f0f0e;
-  --muted-foreground:  #6b6b68;
-  --panel:             #ffffff;
-  --panel-strong:      #f7f7f6;
-  --panel-muted:       #f4f4f2;
+  color-scheme: dark;
+
+  /* Surfaces — dark default */
+  --background:        #0d0d0d;
+  --background-strong: #141414;
+  --foreground:        #f0f0ef;
+  --muted-foreground:  #888884;
+  --panel:             #181818;
+  --panel-strong:      #1f1f1f;
+  --panel-muted:       #1a1a1a;
 
   /* Structure */
-  --border:            rgba(15, 15, 14, 0.10);
-  --border-strong:     rgba(15, 15, 14, 0.18);
-  --ring:              rgba(15, 15, 14, 0.30);
+  --border:            rgba(240, 240, 239, 0.10);
+  --border-strong:     rgba(240, 240, 239, 0.18);
+  --ring:              rgba(240, 240, 239, 0.30);
 
   /* Primary action */
-  --primary:           #0f0f0e;
-  --primary-strong:    #000000;
-  --primary-foreground:#fafaf9;
-  --primary-soft:      rgba(15, 15, 14, 0.06);
+  --primary:           #f0f0ef;
+  --primary-strong:    #ffffff;
+  --primary-foreground:#0d0d0d;
+  --primary-soft:      rgba(240, 240, 239, 0.08);
 
-  /* Track 色（保持原有系统信号色） */
-  --care:      #d66d42;
-  --extension: #1f6b63;
-  --dialogue:  #5070a8;
-  --opc:       #8d5f2c;
+  /* Track 色（系统信号色，保持不变） */
+  --care:      #e07a50;
+  --extension: #2d8a7e;
+  --dialogue:  #6080c0;
+  --opc:       #a87040;
 
   /* 状态色 */
-  --success:       #1a6641;
-  --success-soft:  rgba(26, 102, 65, 0.08);
-  --progress:      #b87333;
-  --progress-soft: rgba(184, 115, 51, 0.10);
+  --success:       #34a870;
+  --success-soft:  rgba(52, 168, 112, 0.12);
+  --progress:      #c8883a;
+  --progress-soft: rgba(200, 136, 58, 0.12);
 
   /* 步骤系统色 */
-  --step-active:  #0f0f0e;
-  --step-done:    #1a6641;
-  --step-pending: #c4c4c1;
+  --step-active:  #f0f0ef;
+  --step-done:    #34a870;
+  --step-pending: #444442;
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    color-scheme: light;
+
+    --background:        #fafaf9;
+    --background-strong: #f4f4f2;
+    --foreground:        #0f0f0e;
+    --muted-foreground:  #6b6b68;
+    --panel:             #ffffff;
+    --panel-strong:      #f7f7f6;
+    --panel-muted:       #f4f4f2;
+
+    --border:            rgba(15, 15, 14, 0.10);
+    --border-strong:     rgba(15, 15, 14, 0.18);
+    --ring:              rgba(15, 15, 14, 0.30);
+
+    --primary:           #0f0f0e;
+    --primary-strong:    #000000;
+    --primary-foreground:#fafaf9;
+    --primary-soft:      rgba(15, 15, 14, 0.06);
+
+    --care:      #d66d42;
+    --extension: #1f6b63;
+    --dialogue:  #5070a8;
+    --opc:       #8d5f2c;
+
+    --success:       #1a6641;
+    --success-soft:  rgba(26, 102, 65, 0.08);
+    --progress:      #b87333;
+    --progress-soft: rgba(184, 115, 51, 0.10);
+
+    --step-active:  #0f0f0e;
+    --step-done:    #1a6641;
+    --step-pending: #c4c4c1;
+  }
 }
 
 * {
@@ -78,7 +117,13 @@ textarea {
 }
 
 ::selection {
-  background: rgba(15, 15, 14, 0.10);
+  background: rgba(240, 240, 239, 0.15);
+}
+
+@media (prefers-color-scheme: light) {
+  ::selection {
+    background: rgba(15, 15, 14, 0.10);
+  }
 }
 
 @layer base {
@@ -92,6 +137,10 @@ textarea {
   p,
   li {
     text-wrap: pretty;
+  }
+
+  .font-serif {
+    font-weight: 700;
   }
 }
 
@@ -121,6 +170,7 @@ textarea {
   }
 
   .code-surface {
-    @apply rounded-xl border border-[color:var(--border)] bg-[#0f0f0e] p-5 text-sm leading-7 text-[#e8f5f1] shadow-[inset_0_1px_0_rgba(255,255,255,0.04)];
+    @apply rounded-xl border border-[color:var(--border)] bg-[#0a0a0a] p-5 text-sm leading-7 text-[#c8fae8] shadow-[inset_0_1px_0_rgba(255,255,255,0.04)];
+    font-family: "Hack", "Hack Nerd Font", "Fira Code", "JetBrains Mono", monospace;
   }
 }

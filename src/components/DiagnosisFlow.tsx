@@ -70,7 +70,7 @@ export function DiagnosisFlow() {
               <button
                 key={opt.value}
                 onClick={() => { setS1(opt.value); setStep(2); }}
-                className="rounded-xl border border-[color:var(--border)] bg-white/70 p-4 text-left transition-all hover:border-[color:var(--foreground)] hover:shadow-sm active:scale-[0.97] active:shadow-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--foreground)]"
+                className="rounded-xl border border-[color:var(--border)] bg-[color:var(--panel)] p-4 text-left transition-all hover:border-[color:var(--foreground)] hover:shadow-sm active:scale-[0.97] active:shadow-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--foreground)]"
               >
                 <p className="text-sm font-semibold text-[color:var(--foreground)]">{opt.label}</p>
                 <p className="mt-1 text-xs leading-6 text-[color:var(--muted-foreground)]">{opt.desc}</p>
@@ -97,7 +97,7 @@ export function DiagnosisFlow() {
               <button
                 key={opt.value}
                 onClick={() => { setS2(opt.value); setStep(3); }}
-                className="rounded-xl border border-[color:var(--border)] bg-white/70 p-4 text-left transition-all hover:border-[color:var(--foreground)] hover:shadow-sm active:scale-[0.97] active:shadow-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--foreground)]"
+                className="rounded-xl border border-[color:var(--border)] bg-[color:var(--panel)] p-4 text-left transition-all hover:border-[color:var(--foreground)] hover:shadow-sm active:scale-[0.97] active:shadow-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--foreground)]"
               >
                 <p className="text-sm font-semibold text-[color:var(--foreground)]">{opt.label}</p>
                 <p className="mt-1 text-xs leading-6 text-[color:var(--muted-foreground)]">{opt.desc}</p>
@@ -118,7 +118,7 @@ export function DiagnosisFlow() {
           <div>
             <p className="text-base font-semibold text-[color:var(--foreground)]">你的第一个经验包是：</p>
           </div>
-          <div className="rounded-xl border-2 border-[color:var(--accent-color,var(--care))] bg-white/80 p-5 space-y-3">
+          <div className="rounded-xl border-2 border-[color:var(--accent-color,var(--care))] bg-[color:var(--panel)] p-5 space-y-3">
             <div className="flex items-center gap-2">
               <Badge variant="accent">{recipe.id}</Badge>
               <span className="text-xs text-[color:var(--muted-foreground)]">{recipe.minutes} 分钟 · 风险 {recipe.riskLevel}</span>
