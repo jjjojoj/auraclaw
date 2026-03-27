@@ -11,14 +11,16 @@ export function ProgressMap() {
 
   const hasAny = completedIds.length > 0;
 
+  if (!hasAny) {
+    return null;
+  }
+
   return (
     <section className="section-space">
       <div className="mb-8">
-        <p className="eyebrow">Your Progress</p>
+        <p className="eyebrow">培养进度</p>
         <h2 className="mt-3 font-serif text-2xl tracking-[-0.02em]">你的培养进度</h2>
-        {!hasAny && (
-          <p className="mt-2 text-sm text-[color:var(--muted-foreground)]">完成第一个经验包后，你的进化地图就会开始生长。</p>
-        )}
+        <p className="mt-2 text-sm text-[color:var(--muted-foreground)]">你已经跑通的经验包，会在这里慢慢连成自己的路径。</p>
       </div>
 
       <div className="divide-y divide-[color:var(--border)]">
