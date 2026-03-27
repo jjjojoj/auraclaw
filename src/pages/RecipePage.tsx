@@ -10,7 +10,6 @@ import {
 } from "@/components/ui/accordion";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { recipes, tracks } from "@/data";
 import { useRecipeProgress } from "@/lib/useRecipeProgress";
 
@@ -21,21 +20,26 @@ function ProgressBar({ current }: { current: "prepare" | "execute" | "validate" 
     <div className="flex items-center gap-0">
       {steps.map((label, i) => (
         <div key={label} className="flex items-center">
-          <div className="flex flex-col items-center gap-1">
+          <div className="flex flex-col items-center gap-1.5">
             <div
-              className={`flex items-center justify-center rounded-full font-semibold transition-all ${i === idx ? "h-8 w-8 text-sm shadow-md" : "h-6 w-6 text-xs"}`}
+              className="h-1.5 w-10 rounded-full transition-all"
               style={{
-                background: i < idx ? "var(--success)" : i === idx ? "var(--accent-color, var(--foreground))" : "var(--border)",
-                color: i <= idx ? "#fff" : "var(--step-pending)",
+                background:
+                  i < idx
+                    ? "var(--success)"
+                    : i === idx
+                      ? "var(--accent-color, var(--foreground))"
+                      : "var(--border-strong)",
               }}
+            />
+            <span
+              className="text-[10px] font-medium uppercase tracking-[0.14em]"
+              style={{ color: i === idx ? "var(--foreground)" : "var(--step-pending)" }}
             >
-              {i < idx ? "✓" : i + 1}
-            </div>
-            <span className="text-xs" style={{ color: i === idx ? "var(--foreground)" : "var(--step-pending)" }}>{label}</span>
+              {label}
+            </span>
           </div>
-          {i < steps.length - 1 && (
-            <div className="mb-4 h-[2px] w-8 sm:w-12" style={{ background: i < idx ? "var(--success)" : "var(--border)" }} />
-          )}
+          {i < steps.length - 1 && <div className="mb-5 h-px w-3" style={{ background: "var(--border)" }} />}
         </div>
       ))}
     </div>
@@ -90,90 +94,79 @@ export function RecipePage() {
 
   return (
     <Layout accent={track?.color}>
-      {/* 页头 */}
-      <section className="grid gap-6 lg:grid-cols-[1.08fr_0.92fr] lg:items-start">
-        <div className="space-y-5">
-          <div className="flex flex-wrap gap-2">
-            <Badge variant="accent">{recipe.id}</Badge>
-            <Badge variant="subtle">{track?.name}</Badge>
-            {recipe.starterLabel ? <Badge>{recipe.starterLabel}</Badge> : null}
-          </div>
-          <div className="space-y-4">
-            <h1 className="max-w-4xl font-serif text-4xl leading-tight tracking-[-0.04em] sm:text-5xl">
+      {/* Header */}
+      <section className="pt-12 sm:pt-20">
+        <div className="flex gap-6">
+          <div className="hidden w-0.5 shrink-0 sm:block" style={{ backgroundColor: track?.color ?? "var(--border)" }} />
+          <div className="flex-1 space-y-4">
+            <div className="flex flex-wrap gap-2">
+              <span className="text-[10px] font-medium uppercase tracking-[0.18em] text-[color:var(--muted-foreground)]">
+                {track?.name}
+              </span>
+              <span className="text-[10px] text-[color:var(--border-strong)]">/</span>
+              <span className="text-[10px] font-medium uppercase tracking-[0.18em] text-[color:var(--muted-foreground)]">
+                {recipe.id}
+              </span>
+              {recipe.starterLabel && (
+                <Badge variant="accent">{recipe.starterLabel}</Badge>
+              )}
+            </div>
+            <h1 className="font-serif text-3xl leading-[1.1] tracking-[-0.02em] sm:text-4xl lg:text-5xl">
               {recipe.title}
             </h1>
-            <p className="max-w-3xl text-lg leading-8 text-[color:var(--foreground)]">{recipe.promise}</p>
-            <p className="max-w-3xl text-base leading-8 text-[color:var(--muted-foreground)]">{recipe.salesPitch ?? recipe.whyItMatters}</p>
+            <p className="max-w-2xl text-base leading-8 text-[color:var(--muted-foreground)]">
+              {recipe.promise}
+            </p>
+            <div className="flex flex-wrap gap-6 text-xs text-[color:var(--muted-foreground)]">
+              <span>{recipe.minutes} 分钟</span>
+              <span>风险 {recipe.riskLevel}</span>
+            </div>
           </div>
         </div>
 
-        <Card>
-          <CardHeader className="gap-3">
-            <Badge variant="subtle">Pack Snapshot</Badge>
-            <CardTitle className="text-2xl leading-9">这包的成色</CardTitle>
-          </CardHeader>
-          <CardContent className="grid gap-4 sm:grid-cols-2">
-            <div className="rounded-[22px] border border-[color:var(--border)] bg-white/70 p-4">
-              <p className="eyebrow">时长</p>
-              <p className="mt-2 text-lg font-semibold">{recipe.minutes} 分钟</p>
-            </div>
-            <div className="rounded-[22px] border border-[color:var(--border)] bg-white/70 p-4">
-              <p className="eyebrow">风险等级</p>
-              <p className="mt-2 text-lg font-semibold">{recipe.riskLevel}</p>
-            </div>
-            <div className="rounded-[22px] border border-[color:var(--border)] bg-white/70 p-4 sm:col-span-2">
-              <p className="eyebrow">适合谁</p>
-              <p className="mt-2 text-sm leading-7 text-[color:var(--muted-foreground)]">{recipe.targetRoles.join(" / ")}</p>
-            </div>
-          </CardContent>
-        </Card>
+        <div className="mt-10">
+          <ProgressBar current={currentPhase} />
+        </div>
       </section>
 
-      {/* 进度条 */}
-      <div className="section-space">
-        <ProgressBar current={currentPhase} />
-      </div>
-
-      {/* 主体：左栏执行主线 + 右栏参考 */}
-      <section className="mt-8 grid gap-8 xl:grid-cols-[1fr_360px]">
-        {/* 左栏：执行主线 */}
-        <div className="space-y-6 rounded-2xl border border-[color:var(--border)] bg-[color:var(--panel)] p-6">
-
-          {/* 完成状态横幅 */}
-          {isCompleted && (
-            <div className="flex items-center gap-3 rounded-2xl border px-5 py-4" style={{ borderColor: "var(--success)", background: "var(--success-soft)" }}>
-              <CheckCircle2 className="h-5 w-5 shrink-0" style={{ color: "var(--success)" }} />
-              <div>
-                <p className="text-sm font-semibold" style={{ color: "var(--success)" }}>已跑通</p>
-                {completedAt && <p className="text-xs" style={{ color: "var(--success)" }}>{completedAt}</p>}
-              </div>
+      {/* Main two-column */}
+      <section className="section-space grid gap-10 lg:grid-cols-[1.4fr_0.6fr] lg:items-start">
+        {/* Left — execution main line */}
+        <div className="space-y-10">
+          {/* Step 1 — 准备 */}
+          <div className="flex gap-5">
+            <div className="flex flex-col items-center gap-1">
+              <span
+                className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-semibold"
+                style={{
+                  background: checkedPrepare > 0 ? "var(--success)" : "var(--foreground)",
+                  color: "var(--primary-foreground)",
+                }}
+              >
+                {checkedPrepare > 0 ? "✓" : "1"}
+              </span>
+              <div className="w-px flex-1 bg-[color:var(--border)]" />
             </div>
-          )}
-
-          {/* 准备清单 */}
-          <Card>
-            <CardHeader className="gap-3">
-              <Badge variant="subtle">Step 1 · 准备</Badge>
-              <CardTitle className="text-xl leading-8">开始之前先确认这几件事</CardTitle>
-            </CardHeader>
-            <CardContent>
+            <div className="flex-1 pb-10">
+              <p className="mb-4 text-xs font-medium uppercase tracking-[0.18em] text-[color:var(--muted-foreground)]">Step 1 · 准备</p>
+              <h2 className="mb-6 font-serif text-xl tracking-[-0.02em]">先确认这几个前提</h2>
               <ul className="space-y-3">
                 {prepareChecklist.map((item, i) => {
                   const checked = stepsChecked.includes(i);
                   return (
                     <li
                       key={item}
-                      className="flex cursor-pointer items-start gap-3 rounded-xl border border-transparent p-2 transition-all hover:border-[color:var(--border)] hover:bg-[color:var(--panel-muted)]"
+                      className="flex cursor-pointer items-start gap-3 rounded-md border border-transparent px-3 py-2 transition-colors hover:border-[color:var(--border)] hover:bg-[color:var(--panel-muted)]  "
                       onClick={() => toggleStep(i)}
                     >
                       {checked ? (
                         <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0" style={{ color: "var(--success)" }} />
                       ) : (
-                        <Circle className="mt-0.5 h-4 w-4 shrink-0" style={{ color: "var(--accent-color, var(--foreground))" }} />
+                        <Circle className="mt-0.5 h-4 w-4 shrink-0 text-[color:var(--border-strong)]" />
                       )}
                       <span
                         className="text-sm leading-7"
-                        style={{ color: checked ? "var(--step-done)" : "var(--foreground)", textDecoration: checked ? "line-through" : "none" }}
+                        style={{ color: checked ? "var(--step-done)" : "var(--foreground)" }}
                       >
                         {item}
                       </span>
@@ -181,55 +174,54 @@ export function RecipePage() {
                   );
                 })}
               </ul>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
 
-          {/* 执行流 */}
-          <Card>
-            <CardHeader className="gap-3">
-              <Badge variant="subtle">Step 2 · 执行</Badge>
-              <CardTitle className="text-xl leading-8">按这个顺序跑</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ol className="space-y-4">
-                {executionFlow.map((step, i) => (
-                  <li key={step} className="flex gap-4">
-                    <div
-                      className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-semibold"
-                      style={{ background: "var(--primary-soft)", color: "var(--foreground)" }}
-                    >
-                      {i + 1}
-                    </div>
-                    <p className="text-sm leading-7 text-[color:var(--foreground)]">{step}</p>
-                  </li>
-                ))}
-              </ol>
-            </CardContent>
-          </Card>
-
-          {/* 复制块 */}
-          <Card>
-            <CardHeader className="gap-3">
-              <Badge variant="subtle">Step 3 · 复制给 OpenClaw</Badge>
-              <CardTitle className="text-xl leading-8">
-                {recipe.shortestCommand ? `最短命令：${recipe.shortestCommand}` : "把这段话复制给 OpenClaw"}
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <CopyButton text={recipe.copyBlock} />
+          {/* Step 2 — 执行 */}
+          <div className="flex gap-5">
+            <div className="flex flex-col items-center gap-1">
+              <span
+                className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-semibold"
+                style={{
+                  background: "var(--foreground)",
+                  color: "var(--primary-foreground)",
+                }}
+              >
+                2
+              </span>
+              <div className="w-px flex-1 bg-[color:var(--border)]" />
+            </div>
+            <div className="flex-1 pb-10">
+              <p className="mb-4 text-xs font-medium uppercase tracking-[0.18em] text-[color:var(--muted-foreground)]">Step 2 · 执行</p>
+              <div className="mb-4 flex items-center justify-between">
+                <h2 className="font-serif text-xl tracking-[-0.02em]">
+                  {recipe.shortestCommand ? `最短命令：${recipe.shortestCommand}` : "把这段话复制给 OpenClaw"}
+                </h2>
+                <CopyButton text={recipe.copyBlock} size="sm" variant="outline" />
+              </div>
               <pre className="code-surface overflow-x-auto">
                 <code>{recipe.copyBlock}</code>
               </pre>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
 
-          {/* 验证清单 */}
-          <Card style={allValidated && !isCompleted ? { borderColor: "var(--progress)", boxShadow: "0 0 0 1px var(--progress)" } : {}}>
-            <CardHeader className="gap-3">
-              <Badge variant="subtle">Step 4 · 验证</Badge>
-              <CardTitle className="text-xl leading-8">跑完之后对照这几条</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
+          {/* Step 3 — 验证 */}
+          <div className="flex gap-5">
+            <div className="flex flex-col items-center gap-1">
+              <span
+                className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-semibold"
+                style={{
+                  background: allValidated ? "var(--success)" : "var(--foreground)",
+                  color: "var(--primary-foreground)",
+                }}
+              >
+                {allValidated ? "✓" : "3"}
+              </span>
+              {!isCompleted && <div className="w-px flex-1 bg-[color:var(--border)]" />}
+            </div>
+            <div className="flex-1 pb-4">
+              <p className="mb-4 text-xs font-medium uppercase tracking-[0.18em] text-[color:var(--muted-foreground)]">Step 3 · 验证</p>
+              <h2 className="mb-6 font-serif text-xl tracking-[-0.02em]">跑完之后对照这几条</h2>
               <ul className="space-y-3">
                 {validationSteps.map((item, i) => {
                   const key = 1000 + i;
@@ -237,17 +229,17 @@ export function RecipePage() {
                   return (
                     <li
                       key={item}
-                      className="flex cursor-pointer items-start gap-3 rounded-xl border border-transparent p-2 transition-all hover:border-[color:var(--border)] hover:bg-[color:var(--panel-muted)]"
+                      className="flex cursor-pointer items-start gap-3 rounded-md border border-transparent px-3 py-2 transition-colors hover:border-[color:var(--border)] hover:bg-[color:var(--panel-muted)]"
                       onClick={() => toggleStep(key)}
                     >
                       {checked ? (
                         <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0" style={{ color: "var(--success)" }} />
                       ) : (
-                        <Circle className="mt-0.5 h-4 w-4 shrink-0" style={{ color: "var(--accent-color, var(--foreground))" }} />
+                        <Circle className="mt-0.5 h-4 w-4 shrink-0 text-[color:var(--border-strong)]" />
                       )}
                       <span
                         className="text-sm leading-7"
-                        style={{ color: checked ? "var(--step-done)" : "var(--foreground)", textDecoration: checked ? "line-through" : "none" }}
+                        style={{ color: checked ? "var(--step-done)" : "var(--foreground)" }}
                       >
                         {item}
                       </span>
@@ -256,127 +248,104 @@ export function RecipePage() {
                 })}
               </ul>
 
-              {!isCompleted && (
-                <Button
-                  className="w-full"
-                  disabled={!allValidated}
-                  onClick={markComplete}
-                  style={allValidated ? { background: "var(--success)", color: "#fff" } : {}}
-                >
-                  {allValidated ? "标记为已跑通" : `还有 ${totalValidation - checkedValidation} 条验证未完成`}
-                </Button>
-              )}
-            </CardContent>
-          </Card>
+              <div className="mt-6">
+                {isCompleted ? (
+                  <p className="text-sm font-medium" style={{ color: "var(--success)" }}>
+                    ✓ 已跑通 · {completedAt ? new Date(completedAt).toLocaleDateString("zh-CN") : ""}
+                  </p>
+                ) : (
+                  <Button
+                    disabled={!allValidated}
+                    onClick={markComplete}
+                    style={allValidated ? { background: "var(--success)", color: "#fff" } : {}}
+                  >
+                    {allValidated
+                      ? "标记为已跑通 ✓"
+                      : `还有 ${totalValidation - checkedValidation} 条验证未完成`}
+                  </Button>
+                )}
+              </div>
+            </div>
+          </div>
         </div>
 
-        {/* 右栏：参考信息 */}
-        <div className="space-y-4">
-          <Accordion collapsible type="single">
-            {deliverables.length > 0 && (
-              <AccordionItem value="deliverables">
-                <AccordionTrigger className="text-sm font-medium">你会拿到什么</AccordionTrigger>
-                <AccordionContent>
-                  <ul className="space-y-2">
-                    {deliverables.map((item) => (
-                      <li key={item} className="flex gap-3 text-sm leading-7">
-                        <span className="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[color:var(--accent-color)]" />
-                        {item}
-                      </li>
-                    ))}
-                  </ul>
-                </AccordionContent>
-              </AccordionItem>
-            )}
-
-            {recipe.dependencies && recipe.dependencies.length > 0 && (
-              <AccordionItem value="deps">
-                <AccordionTrigger className="text-sm font-medium">需要装什么</AccordionTrigger>
-                <AccordionContent>
-                  <div className="space-y-3">
-                    {recipe.dependencies.map((dep) => (
-                      <div key={dep.name} className="rounded-xl border border-[color:var(--border)] bg-white/60 p-3">
-                        <div className="flex items-center justify-between gap-2">
-                          <p className="text-sm font-semibold">{dep.name}</p>
-                          <Badge variant="subtle">{dep.kind}</Badge>
-                        </div>
-                        <p className="mt-1 text-xs leading-6 text-[color:var(--muted-foreground)]">{dep.summary}</p>
-                        <p className="mt-1 text-xs text-[color:var(--muted-foreground)]">{dep.source}</p>
-                      </div>
-                    ))}
-                  </div>
-                </AccordionContent>
-              </AccordionItem>
-            )}
-
-            {pitfalls.length > 0 && (
-              <AccordionItem value="pitfalls">
-                <AccordionTrigger className="text-sm font-medium">常见踩坑</AccordionTrigger>
-                <AccordionContent>
-                  <div className="space-y-3">
-                    {pitfalls.map((p) => (
-                      <div key={p.issue} className="rounded-xl border border-[color:var(--border)] bg-white/60 p-3">
-                        <p className="text-sm font-semibold">{p.issue}</p>
-                        <p className="mt-1 text-xs leading-6 text-[color:var(--muted-foreground)]">{p.fix}</p>
-                      </div>
-                    ))}
-                  </div>
-                </AccordionContent>
-              </AccordionItem>
-            )}
-
-            {fallbackPlan.length > 0 && (
-              <AccordionItem value="fallback">
-                <AccordionTrigger className="text-sm font-medium">失败了怎么退</AccordionTrigger>
-                <AccordionContent>
-                  <ul className="space-y-2">
-                    {fallbackPlan.map((item) => (
-                      <li key={item} className="flex gap-3 text-sm leading-7">
-                        <span className="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[color:var(--accent-color)]" />
-                        {item}
-                      </li>
-                    ))}
-                  </ul>
-                </AccordionContent>
-              </AccordionItem>
-            )}
-
-            {bestFor.length > 0 && (
-              <AccordionItem value="bestfor">
-                <AccordionTrigger className="text-sm font-medium">最适合的情况</AccordionTrigger>
-                <AccordionContent>
-                  <ul className="space-y-2">
-                    {bestFor.map((item) => (
-                      <li key={item} className="flex gap-3 text-sm leading-7">
-                        <span className="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[color:var(--accent-color)]" />
-                        {item}
-                      </li>
-                    ))}
-                  </ul>
-                </AccordionContent>
-              </AccordionItem>
-            )}
-
-            <AccordionItem value="nextstep">
-              <AccordionTrigger className="text-sm font-medium">成功后下一步</AccordionTrigger>
+        {/* Right — reference accordion */}
+        <div className="space-y-0 border-t border-[color:var(--border)] lg:border-l lg:border-t-0 lg:pl-8 lg:pt-0 pt-8">
+          <Accordion type="multiple">
+            <AccordionItem value="deliverables">
+              <AccordionTrigger className="text-sm">你会拿到什么</AccordionTrigger>
               <AccordionContent>
-                <p className="text-sm leading-7 text-[color:var(--foreground)]">{recipe.nextStep}</p>
+                <ul className="space-y-2">
+                  {deliverables.map((item) => (
+                    <li key={item} className="flex gap-2 text-sm leading-7">
+                      <span className="mt-2.5 h-1 w-1 shrink-0 rounded-full bg-[color:var(--foreground)]" />
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="pitfalls">
+              <AccordionTrigger className="text-sm">常见踩坑</AccordionTrigger>
+              <AccordionContent>
+                <ul className="space-y-4">
+                  {pitfalls.map((p) => (
+                    <li key={p.issue}>
+                      <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[color:var(--foreground)] mb-1">{p.issue}</p>
+                      <p className="text-sm leading-7 text-[color:var(--muted-foreground)]">{p.fix}</p>
+                    </li>
+                  ))}
+                </ul>
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="fallback">
+              <AccordionTrigger className="text-sm">失败了怎么退</AccordionTrigger>
+              <AccordionContent>
+                <ul className="space-y-2">
+                  {fallbackPlan.map((item) => (
+                    <li key={item} className="flex gap-2 text-sm leading-7">
+                      <span className="mt-2.5 h-1 w-1 shrink-0 rounded-full bg-[color:var(--muted-foreground)]" />
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="bestfor">
+              <AccordionTrigger className="text-sm">最适合的情况</AccordionTrigger>
+              <AccordionContent>
+                <ul className="space-y-2">
+                  {bestFor.map((item) => (
+                    <li key={item} className="flex gap-2 text-sm leading-7">
+                      <span className="mt-2.5 h-1 w-1 shrink-0 rounded-full bg-[color:var(--muted-foreground)]" />
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="nextstep" className="border-b-0">
+              <AccordionTrigger className="text-sm">成功后下一步</AccordionTrigger>
+              <AccordionContent>
+                <p className="text-sm leading-7">{recipe.nextStep}</p>
               </AccordionContent>
             </AccordionItem>
           </Accordion>
 
           {recipe.sampleInput && (
-            <Card>
-              <CardHeader className="gap-3">
-                <Badge variant="subtle">First Run</Badge>
-                <CardTitle className="text-lg leading-7">{recipe.sampleInput.title}</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <pre className="rounded-[22px] border border-[color:var(--border)] bg-white/70 p-4 text-xs leading-6 text-[color:var(--foreground)] whitespace-pre-wrap">
-                  <code>{recipe.sampleInput.content}</code>
-                </pre>
-              </CardContent>
-            </Card>
+            <div className="mt-8 border-t border-[color:var(--border)] pt-6">
+              <p className="mb-3 text-[10px] font-medium uppercase tracking-[0.16em] text-[color:var(--muted-foreground)]">
+                First Run
+              </p>
+              <p className="mb-3 text-sm font-medium">{recipe.sampleInput.title}</p>
+              <pre className="rounded-md border border-[color:var(--border)] bg-[color:var(--panel-muted)] p-4 text-xs leading-6 whitespace-pre-wrap">
+                <code>{recipe.sampleInput.content}</code>
+              </pre>
+            </div>
           )}
         </div>
       </section>
