@@ -1,0 +1,149 @@
+run_at: '2026-04-08T16:41:34.620185'
+collector: auraclaw-scout
+status: completed
+focus_theme: OpenClaw 中文生态 / 能力扩展 / 平台接入 / OPC
+save_path: /Users/joe/Documents/New project/auraclaw/content/inbox/source-harvest/2026-04-08_1641.yaml
+summary:
+  scanned_sources_count: 7
+  accepted_candidates_count: 5
+  rejected_candidates_count: 195
+  notes: 扫描了 7 个来源，接受 5 条，拒绝 195 条
+accepted_candidates:
+- id: CAND-001
+  type: source_note_candidate
+  title: 🔥 典型案例：奢侈品买手 AI 工作流
+  source_name: openclaw101.club
+  source_url: https://www.openclaw101.club/docs/cases/luxury-trade/
+  content_type: tutorial
+  board_fit:
+  - care
+  why_it_matters: 适合作为 AuraClaw care 板块的来源素材
+  one_line_summary: 🔥 典型案例：奢侈品买手 AI 工作流
+  suggested_recipe_title: 基于「🔥 典型案例：奢侈品买手 AI 工作流」改写
+  suggested_angle: 提取可复用的经验或来源索引
+  confidence: high
+  needs_manual_review: true
+- id: CAND-002
+  type: source_note_candidate
+  title: 从零开发自定义 Skill
+  source_name: openclaw101.club
+  source_url: https://www.openclaw101.club/docs/expert/write-skill
+  content_type: tutorial
+  board_fit:
+  - extension
+  why_it_matters: 适合作为 AuraClaw extension 板块的来源素材
+  one_line_summary: 从零开发自定义 Skill
+  suggested_recipe_title: 基于「从零开发自定义 Skill」改写
+  suggested_angle: 提取可复用的经验或来源索引
+  confidence: high
+  needs_manual_review: true
+- id: CAND-003
+  type: source_note_candidate
+  title: 2026.3.12 更新后 Google Chat webhook 全部 404，根因是 ESM/CJS 模块分裂导致插件注册表不共享
+  source_name: claw101.com
+  source_url: https://github.com/openclaw/openclaw/issues/45544
+  content_type: repo
+  board_fit:
+  - extension
+  why_it_matters: 适合作为 AuraClaw extension 板块的来源素材
+  one_line_summary: 2026.3.12 更新后 Google Chat webhook 全部 404，根因是 ESM/CJS 模块分裂导致插件注册表不共享
+  suggested_recipe_title: 基于「2026.3.12 更新后 Google Chat webh」改写
+  suggested_angle: 提取可复用的经验或来源索引
+  confidence: high
+  needs_manual_review: true
+- id: CAND-004
+  type: source_note_candidate
+  title: 'GitHub #45057: 配置 Anthropic 模型导致 gateway 启动崩溃（ANTHROPIC_MODEL_ALIASES 未初始化），有
+    wo'
+  source_name: claw101.com
+  source_url: https://github.com/openclaw/openclaw/issues/45057
+  content_type: repo
+  board_fit:
+  - extension
+  why_it_matters: 适合作为 AuraClaw extension 板块的来源素材
+  one_line_summary: 'GitHub #45057: 配置 Anthropic 模型导致 gateway 启动崩溃（ANTHROPIC_MODEL_ALIASES
+    未初始化），有 workaround'
+  suggested_recipe_title: '基于「GitHub #45057: 配置 Anthropic 模型」改写'
+  suggested_angle: 提取可复用的经验或来源索引
+  confidence: high
+  needs_manual_review: true
+- id: CAND-005
+  type: source_note_candidate
+  title: View Details
+  source_name: openclawskill.ai
+  source_url: https://github.com/seedprod/openclaw-prompts-and-skills/blob/main/SOUL.md
+  content_type: repo
+  board_fit:
+  - extension
+  - dialogue
+  why_it_matters: 适合作为 AuraClaw extension 板块的来源素材
+  one_line_summary: View Details
+  suggested_recipe_title: 基于「View Details」改写
+  suggested_angle: 提取可复用的经验或来源索引
+  confidence: high
+  needs_manual_review: true
+rejected_candidates:
+- title: Community Examples
+  source_url: https://openclawskill.ai/
+  reason: 重复
+- title: 开发自定义技能
+  source_url: https://www.openclaw101.club/docs/expert/write-skill/
+  reason: 标题过短
+- title: 自己写 Skill
+  source_url: https://www.openclaw101.club/docs/expert/write-skill
+  reason: 标题过短
+- title: 技能系统入门
+  source_url: https://www.openclaw101.club/docs/advanced/skills
+  reason: 标题过短
+- title: openclaw101 - 🐾 OpenClaw 101 — 从零开始，7天掌握你的AI私人助理 | 全网资源聚合站
+  source_url: https://github.com/mengjian-github/openclaw101
+  reason: 重复
+- title: awesome-openclaw-tutorial - 从零开始玩转OpenClaw：最全面的中文教程，涵盖安装、配置、实战案例和避坑指南（github版）
+  source_url: https://github.com/xianyu110/awesome-openclaw-tutorial
+  reason: 重复
+- title: 'awesome-openclaw-skills - The awesome collection of OpenClaw skills. 5,400+ '
+  source_url: https://github.com/VoltAgent/awesome-openclaw-skills
+  reason: 重复
+- title: View Details
+  source_url: https://github.com/seedprod/openclaw-prompts-and-skills/blob/main/CLAUDE.md
+  reason: 超过数量限制
+- title: View Details
+  source_url: https://github.com/seedprod/openclaw-prompts-and-skills/blob/main/BOOTSTRAP.md
+  reason: 超过数量限制
+- title: View Details
+  source_url: https://github.com/seedprod/openclaw-prompts-and-skills/blob/main/IDENTITY.md
+  reason: 超过数量限制
+- title: View Details
+  source_url: https://github.com/seedprod/openclaw-prompts-and-skills/blob/main/telegram-claude-poc.py
+  reason: 超过数量限制
+- title: View Details
+  source_url: https://github.com/seedprod/openclaw-prompts-and-skills/blob/main/OPENCLAW_SYSTEM_PROMPT_STUDY.md
+  reason: 超过数量限制
+- title: View Details
+  source_url: https://github.com/seedprod/openclaw-prompts-and-skills/blob/main/TOOLS.md
+  reason: 超过数量限制
+- title: View Details
+  source_url: https://github.com/seedprod/openclaw-prompts-and-skills/blob/main/USER.md
+  reason: 超过数量限制
+- title: View Details
+  source_url: https://github.com/seedprod/openclaw-prompts-and-skills/blob/main/CLAUDE.md
+  reason: 超过数量限制
+- title: View Details
+  source_url: https://github.com/seedprod/openclaw-prompts-and-skills
+  reason: 超过数量限制
+- title: View Details
+  source_url: https://github.com/seedprod/openclaw-prompts-and-skills/blob/main/OPENCLAW_SYSTEM_PROMPT_STUDY.md
+  reason: 超过数量限制
+- title: View Details
+  source_url: https://github.com/seedprod/openclaw-prompts-and-skills/blob/main/telegram-claude-poc.py
+  reason: 超过数量限制
+- title: 🔥 典型案例
+  source_url: https://www.openclaw101.club/docs/cases/luxury-trade
+  reason: 标题过短
+- title: 📋 企业风险评估
+  source_url: https://www.openclaw101.club/assessment/
+  reason: 标题过短
+next_actions:
+- 审查 accepted_candidates
+- 选择高质量条目改写成 source-note 或 recipe
+- 更新 src/source-notes.ts
