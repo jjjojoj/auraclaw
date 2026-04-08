@@ -126,6 +126,8 @@ export interface ReviewPublished {
   fileName: string;
   publishedAt: string;
   publicPath: string;
+  pinned?: boolean;
+  position?: number;
   snapshotPath?: string;
 }
 
@@ -154,6 +156,8 @@ export interface ReviewCandidate {
   reviewedAt: string;
   draft?: ReviewDraft | null;
   published?: ReviewPublished | null;
+  lastUnpublishedAt?: string;
+  lastUnpublishReason?: string;
   history: ReviewHistoryEntry[];
 }
 

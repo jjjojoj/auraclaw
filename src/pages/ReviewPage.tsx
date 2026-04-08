@@ -1,5 +1,17 @@
 import { useEffect, useState, type ReactNode } from "react";
-import { CheckCheck, Clock3, FileStack, RotateCcw, Search, ShieldAlert, XCircle } from "lucide-react";
+import {
+  ArrowDown,
+  ArrowUp,
+  CheckCheck,
+  Clock3,
+  FileStack,
+  Pin,
+  PinOff,
+  RotateCcw,
+  Search,
+  ShieldAlert,
+  XCircle,
+} from "lucide-react";
 import { useNavigate, useOutletContext } from "react-router-dom";
 import { AdminLayout } from "@/components/AdminLayout";
 import { SectionHeading } from "@/components/SectionHeading";
@@ -74,6 +86,7 @@ export function ReviewPage() {
   const [boardFilter, setBoardFilter] = useState<TrackId | "all">("all");
   const [query, setQuery] = useState("");
   const [notesDraft, setNotesDraft] = useState<Record<string, string>>({});
+  const [unpublishReasonDraft, setUnpublishReasonDraft] = useState<Record<string, string>>({});
   const [draftPreviews, setDraftPreviews] = useState<Record<string, DraftPreview | null>>({});
   const [draftLoadingKey, setDraftLoadingKey] = useState("");
   const [savingKey, setSavingKey] = useState<string>("");
@@ -106,6 +119,15 @@ export function ReviewPage() {
         for (const candidate of data.candidates ?? []) {
           if (!(candidate.key in next)) {
             next[candidate.key] = candidate.notes ?? "";
+          }
+        }
+        return next;
+      });
+      setUnpublishReasonDraft((current) => {
+        const next = { ...current };
+        for (const candidate of data.candidates ?? []) {
+          if (!(candidate.key in next)) {
+            next[candidate.key] = candidate.lastUnpublishReason ?? "";
           }
         }
         return next;
@@ -197,12 +219,20 @@ export function ReviewPage() {
   }
 
   async function unpublishCandidate(candidate: ReviewCandidate) {
+    const reason = (unpublishReasonDraft[candidate.key] ?? "").trim();
+    if (!reason) {
+      setError("撤回发布前请先填写下线原因。");
+      return;
+    }
+
     setPublishingKey(candidate.key);
     setError("");
 
     try {
       const response = await fetch(`/api/review/candidates/${candidate.key}/unpublish`, {
         method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ reason }),
       });
       if (response.status === 401) {
         navigate("/admin/login", { replace: true });
@@ -212,6 +242,32 @@ export function ReviewPage() {
       await loadCandidates();
     } catch (err) {
       setError(err instanceof Error ? err.message : "撤回失败");
+    } finally {
+      setPublishingKey("");
+    }
+  }
+
+  async function runPublishControl(
+    candidate: ReviewCandidate,
+    action: "move_up" | "move_down" | "pin" | "unpin",
+  ) {
+    setPublishingKey(candidate.key);
+    setError("");
+
+    try {
+      const response = await fetch(`/api/review/candidates/${candidate.key}/publish-controls`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action }),
+      });
+      if (response.status === 401) {
+        navigate("/admin/login", { replace: true });
+        return;
+      }
+      if (!response.ok) throw new Error("更新前台排序失败");
+      await loadCandidates();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "更新失败");
     } finally {
       setPublishingKey("");
     }
@@ -431,7 +487,23 @@ export function ReviewPage() {
                           发布时间：{formatTime(candidate.published.publishedAt)}
                         </p>
                         <p className="text-[color:var(--muted-foreground)]">
+                          前台排序：第 {candidate.published.position ?? "?"} 位
+                          {candidate.published.pinned ? " · 已置顶" : " · 普通排序"}
+                        </p>
+                        <p className="text-[color:var(--muted-foreground)]">
                           公开路径：{candidate.published.publicPath}
+                        </p>
+                      </div>
+                    </div>
+                  ) : null}
+
+                  {candidate.lastUnpublishReason ? (
+                    <div className="border-t border-[color:var(--border)] pt-4">
+                      <p className="eyebrow mb-2">最近一次下线记录</p>
+                      <div className="space-y-2 text-sm leading-7 text-[color:var(--foreground)]">
+                        <p>{candidate.lastUnpublishReason}</p>
+                        <p className="text-[color:var(--muted-foreground)]">
+                          下线时间：{formatTime(candidate.lastUnpublishedAt || "")}
                         </p>
                       </div>
                     </div>
@@ -508,7 +580,7 @@ export function ReviewPage() {
                           </Button>
                           <Button
                             type="button"
-                            disabled={publishingKey === candidate.key}
+                            disabled={publishingKey === candidate.key || !(unpublishReasonDraft[candidate.key] ?? "").trim()}
                             onClick={() => void unpublishCandidate(candidate)}
                             variant="outline"
                             className="justify-start rounded-full"
@@ -531,6 +603,73 @@ export function ReviewPage() {
                           发布到前台
                         </Button>
                       )}
+                    </div>
+                  ) : null}
+
+                  {candidate.published ? (
+                    <div className="space-y-3 border-t border-[color:var(--border)] pt-4">
+                      <p className="eyebrow">发布后管理</p>
+                      <div className="grid gap-3 sm:grid-cols-2">
+                        <Button
+                          type="button"
+                          disabled={publishingKey === candidate.key}
+                          onClick={() => void runPublishControl(candidate, "move_up")}
+                          variant="outline"
+                          className="justify-start rounded-full"
+                        >
+                          <ArrowUp className="h-4 w-4" />
+                          上移一位
+                        </Button>
+                        <Button
+                          type="button"
+                          disabled={publishingKey === candidate.key}
+                          onClick={() => void runPublishControl(candidate, "move_down")}
+                          variant="outline"
+                          className="justify-start rounded-full"
+                        >
+                          <ArrowDown className="h-4 w-4" />
+                          下移一位
+                        </Button>
+                        <Button
+                          type="button"
+                          disabled={publishingKey === candidate.key}
+                          onClick={() =>
+                            void runPublishControl(candidate, candidate.published?.pinned ? "unpin" : "pin")
+                          }
+                          variant="outline"
+                          className="justify-start rounded-full sm:col-span-2"
+                        >
+                          {candidate.published?.pinned ? (
+                            <>
+                              <PinOff className="h-4 w-4" />
+                              取消置顶
+                            </>
+                          ) : (
+                            <>
+                              <Pin className="h-4 w-4" />
+                              置顶到前台前列
+                            </>
+                          )}
+                        </Button>
+                      </div>
+                    </div>
+                  ) : null}
+
+                  {(candidate.published || candidate.lastUnpublishReason) ? (
+                    <div className="space-y-2 border-t border-[color:var(--border)] pt-4">
+                      <p className="eyebrow">下线原因记录</p>
+                      <textarea
+                        value={unpublishReasonDraft[candidate.key] ?? ""}
+                        onChange={(event) =>
+                          setUnpublishReasonDraft((current) => ({
+                            ...current,
+                            [candidate.key]: event.target.value,
+                          }))
+                        }
+                        rows={3}
+                        className="w-full resize-y border border-[color:var(--border)] bg-[color:var(--panel)] px-3 py-3 text-sm leading-7 outline-none"
+                        placeholder="比如：标题还不稳、需要补真实示例、排序让位给更高优先级内容。"
+                      />
                     </div>
                   ) : null}
 

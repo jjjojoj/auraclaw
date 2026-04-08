@@ -34,6 +34,19 @@ const collections = [
   },
 ];
 
+function prioritizeByPublishedId<T extends { id: string }>(
+  items: T[],
+  publishedPrefix: string,
+  fallbackIds: string[],
+  limit: number,
+) {
+  const published = items.filter((item) => item.id.startsWith(publishedPrefix));
+  const fallback = items.filter((item) => fallbackIds.includes(item.id));
+  const merged = [...published, ...fallback];
+  const unique = new Map(merged.map((item) => [item.id, item]));
+  return Array.from(unique.values()).slice(0, limit);
+}
+
 function getTrackMeta(trackId: TrackId) {
   const track = tracks.find((item) => item.id === trackId);
   return {
@@ -110,7 +123,7 @@ function SourceNoteCard({ note }: { note: SourceNote }) {
 }
 
 export function SourceIndexPage() {
-  const featuredNotes = sourceNotes.filter((note) => featuredSourceNoteIds.includes(note.id));
+  const featuredNotes = prioritizeByPublishedId(sourceNotes, "PUB-SRC-", featuredSourceNoteIds, 4);
   const newbieCount = sourceNotes.filter((note) => note.newbieFriendly).length;
   const chinesePlatformCount = sourceNotes.filter((note) =>
     note.recommendedFor.some((item) => item.includes("接入") || item.includes("协作")),

@@ -138,6 +138,65 @@ function writePublishedStore(filePath, data) {
   fs.writeFileSync(filePath, JSON.stringify(data, null, 2), "utf8");
 }
 
+function getPublishedStoreFileByType(type) {
+  return type === "approved_source_note" ? PUBLISHED_SOURCE_NOTES_FILE : PUBLISHED_RECIPES_FILE;
+}
+
+function normalizePublishedItems(items) {
+  const nextItems = Array.isArray(items) ? [...items] : [];
+  const pinned = nextItems.filter((item) => item?.pinned);
+  const unpinned = nextItems.filter((item) => !item?.pinned);
+  return [...pinned, ...unpinned].map((item, index) => ({
+    ...item,
+    pinned: Boolean(item?.pinned),
+    sortOrder: index,
+  }));
+}
+
+function updatePublishedStore(filePath, updater) {
+  const store = readPublishedStore(filePath);
+  const nextItems = updater(store.items ?? []);
+  const normalizedItems = normalizePublishedItems(nextItems);
+  const nextStore = { ...store, items: normalizedItems };
+  writePublishedStore(filePath, nextStore);
+  return nextStore;
+}
+
+function getPublishedLookup() {
+  const stores = [
+    {
+      type: "approved_source_note",
+      publicPath: "/sources",
+      filePath: PUBLISHED_SOURCE_NOTES_FILE,
+      store: readPublishedStore(PUBLISHED_SOURCE_NOTES_FILE),
+    },
+    {
+      type: "approved_recipe",
+      publicPath: "",
+      filePath: PUBLISHED_RECIPES_FILE,
+      store: readPublishedStore(PUBLISHED_RECIPES_FILE),
+    },
+  ];
+
+  const lookup = new Map();
+  for (const entry of stores) {
+    const items = normalizePublishedItems(entry.store.items ?? []);
+    items.forEach((item, index) => {
+      lookup.set(item.candidateKey, {
+        type: entry.type,
+        filePath: entry.filePath,
+        fileName: path.basename(entry.filePath),
+        publishedAt: item.publishedAt,
+        publicPath: item.publicPath || entry.publicPath,
+        pinned: Boolean(item.pinned),
+        position: index + 1,
+      });
+    });
+  }
+
+  return lookup;
+}
+
 function readReviewState() {
   ensureReviewStorage();
   const state = safeReadJson(REVIEW_STATE_FILE, { decisions: {} });
@@ -539,44 +598,50 @@ function buildPublishedRecipe(candidate, notes, now) {
 
 function publishCandidate(candidate, status, notes, now, previousPublished) {
   if (status === "approved_source_note") {
-    const store = readPublishedStore(PUBLISHED_SOURCE_NOTES_FILE);
     const note = buildPublishedSourceNote(candidate, notes, now);
-    const item = {
-      candidateKey: candidate.key,
-      publishedAt: now,
-      publicPath: "/sources",
-      note,
-    };
-    store.items = store.items.filter((entry) => entry.candidateKey !== candidate.key);
-    store.items.unshift(item);
-    writePublishedStore(PUBLISHED_SOURCE_NOTES_FILE, store);
+    const filePath = PUBLISHED_SOURCE_NOTES_FILE;
+    updatePublishedStore(filePath, (items) => {
+      const existing = items.find((entry) => entry.candidateKey === candidate.key);
+      const item = {
+        candidateKey: candidate.key,
+        publishedAt: now,
+        publicPath: "/sources",
+        pinned: existing?.pinned ?? previousPublished?.pinned ?? false,
+        note,
+      };
+      return [item, ...items.filter((entry) => entry.candidateKey !== candidate.key)];
+    });
     return {
       type: status,
-      filePath: PUBLISHED_SOURCE_NOTES_FILE,
-      fileName: path.basename(PUBLISHED_SOURCE_NOTES_FILE),
+      filePath,
+      fileName: path.basename(filePath),
       publishedAt: now,
       publicPath: "/sources",
+      pinned: previousPublished?.pinned ?? false,
       snapshotPath: previousPublished?.filePath ?? "",
     };
   }
 
-  const store = readPublishedStore(PUBLISHED_RECIPES_FILE);
   const recipe = buildPublishedRecipe(candidate, notes, now);
-  const item = {
-    candidateKey: candidate.key,
-    publishedAt: now,
-    publicPath: `/recipes/${recipe.slug}`,
-    recipe,
-  };
-  store.items = store.items.filter((entry) => entry.candidateKey !== candidate.key);
-  store.items.unshift(item);
-  writePublishedStore(PUBLISHED_RECIPES_FILE, store);
+  const filePath = PUBLISHED_RECIPES_FILE;
+  updatePublishedStore(filePath, (items) => {
+    const existing = items.find((entry) => entry.candidateKey === candidate.key);
+    const item = {
+      candidateKey: candidate.key,
+      publishedAt: now,
+      publicPath: `/recipes/${recipe.slug}`,
+      pinned: existing?.pinned ?? previousPublished?.pinned ?? false,
+      recipe,
+    };
+    return [item, ...items.filter((entry) => entry.candidateKey !== candidate.key)];
+  });
   return {
     type: status,
-    filePath: PUBLISHED_RECIPES_FILE,
-    fileName: path.basename(PUBLISHED_RECIPES_FILE),
+    filePath,
+    fileName: path.basename(filePath),
     publishedAt: now,
     publicPath: `/recipes/${recipe.slug}`,
+    pinned: previousPublished?.pinned ?? false,
     snapshotPath: previousPublished?.filePath ?? "",
   };
 }
@@ -586,11 +651,110 @@ function unpublishCandidate(candidate, published) {
     return;
   }
 
-  const targetFile =
-    published.type === "approved_source_note" ? PUBLISHED_SOURCE_NOTES_FILE : PUBLISHED_RECIPES_FILE;
-  const store = readPublishedStore(targetFile);
-  store.items = store.items.filter((entry) => entry.candidateKey !== candidate.key);
-  writePublishedStore(targetFile, store);
+  const targetFile = getPublishedStoreFileByType(published.type);
+  updatePublishedStore(targetFile, (items) =>
+    items.filter((entry) => entry.candidateKey !== candidate.key),
+  );
+}
+
+function movePublishedCandidate(candidate, published, direction) {
+  const targetFile = getPublishedStoreFileByType(published.type);
+  const nextStore = updatePublishedStore(targetFile, (items) => {
+    const index = items.findIndex((entry) => entry.candidateKey === candidate.key);
+    if (index === -1) {
+      return items;
+    }
+
+    const current = items[index];
+    const targetPinned = Boolean(current?.pinned);
+    const laneIndexes = items
+      .map((entry, itemIndex) => ({ entry, itemIndex }))
+      .filter(({ entry }) => Boolean(entry?.pinned) === targetPinned)
+      .map(({ itemIndex }) => itemIndex);
+    const lanePosition = laneIndexes.indexOf(index);
+    if (lanePosition === -1) {
+      return items;
+    }
+
+    const neighborLanePosition = direction === "up" ? lanePosition - 1 : lanePosition + 1;
+    if (neighborLanePosition < 0 || neighborLanePosition >= laneIndexes.length) {
+      return items;
+    }
+
+    const swapIndex = laneIndexes[neighborLanePosition];
+    const nextItems = [...items];
+    [nextItems[index], nextItems[swapIndex]] = [nextItems[swapIndex], nextItems[index]];
+    return nextItems;
+  });
+
+  const updatedItem = nextStore.items.find((entry) => entry.candidateKey === candidate.key);
+  return updatedItem
+    ? {
+        ...published,
+        pinned: Boolean(updatedItem.pinned),
+        position: Number(updatedItem.sortOrder ?? 0) + 1,
+      }
+    : published;
+}
+
+function setPublishedPin(candidate, published, pinned) {
+  const targetFile = getPublishedStoreFileByType(published.type);
+  const nextStore = updatePublishedStore(targetFile, (items) => {
+    const index = items.findIndex((entry) => entry.candidateKey === candidate.key);
+    if (index === -1) {
+      return items;
+    }
+
+    const current = { ...items[index], pinned: Boolean(pinned) };
+    const nextItems = items.filter((entry) => entry.candidateKey !== candidate.key);
+    if (pinned) {
+      const firstUnpinnedIndex = nextItems.findIndex((entry) => !entry.pinned);
+      if (firstUnpinnedIndex === -1) {
+        nextItems.push(current);
+      } else {
+        nextItems.splice(firstUnpinnedIndex, 0, current);
+      }
+    } else {
+      nextItems.push(current);
+    }
+    return nextItems;
+  });
+
+  const updatedItem = nextStore.items.find((entry) => entry.candidateKey === candidate.key);
+  return updatedItem
+    ? {
+        ...published,
+        pinned: Boolean(updatedItem.pinned),
+        position: Number(updatedItem.sortOrder ?? 0) + 1,
+      }
+    : published;
+}
+
+function buildPublishNote(entry) {
+  return {
+    candidateKey: entry.candidateKey,
+    publishedAt: entry.publishedAt,
+    pinned: Boolean(entry.pinned),
+    sortOrder: Number(entry.sortOrder ?? 0),
+    note: entry.note,
+  };
+}
+
+function buildPublishRecipe(entry) {
+  return {
+    candidateKey: entry.candidateKey,
+    publishedAt: entry.publishedAt,
+    pinned: Boolean(entry.pinned),
+    sortOrder: Number(entry.sortOrder ?? 0),
+    recipe: entry.recipe,
+  };
+}
+
+function updateStateDecision(state, key, patch) {
+  state.decisions[key] = {
+    ...(state.decisions[key] ?? {}),
+    ...patch,
+  };
 }
 
 function listHarvestRuns() {
@@ -623,7 +787,7 @@ function createCandidateKey(runFileName, candidate) {
   return createHash("sha1").update(basis).digest("hex").slice(0, 16);
 }
 
-function normalizeCandidate(run, candidate, reviewState, reviewHistory, originLayer = "accepted") {
+function normalizeCandidate(run, candidate, reviewState, reviewHistory, publishedLookup, originLayer = "accepted") {
   const key = createCandidateKey(run.fileName, candidate);
   const currentDecision =
     reviewState.decisions[key] ?? {
@@ -633,6 +797,8 @@ function normalizeCandidate(run, candidate, reviewState, reviewHistory, originLa
       reviewedAt: "",
       draft: null,
       published: null,
+      lastUnpublishedAt: "",
+      lastUnpublishReason: "",
     };
   const contentType = candidate.content_type ?? "";
   const boardFit = sanitizeBoardFit(candidate.board_fit, candidate.board_fit_guess);
@@ -681,7 +847,9 @@ function normalizeCandidate(run, candidate, reviewState, reviewHistory, originLa
     reviewer: currentDecision.reviewer ?? "",
     reviewedAt: currentDecision.reviewedAt ?? "",
     draft: currentDecision.draft ?? null,
-    published: currentDecision.published ?? null,
+    published: publishedLookup.get(key) ?? currentDecision.published ?? null,
+    lastUnpublishedAt: currentDecision.lastUnpublishedAt ?? "",
+    lastUnpublishReason: currentDecision.lastUnpublishReason ?? "",
     history: reviewHistory.filter((entry) => entry.candidateKey === key),
   };
 }
@@ -690,6 +858,7 @@ function getAllCandidates() {
   const runs = listHarvestRuns();
   const reviewState = readReviewState();
   const reviewHistory = readReviewHistory();
+  const publishedLookup = getPublishedLookup();
   const candidates = [];
 
   for (const run of runs) {
@@ -697,12 +866,12 @@ function getAllCandidates() {
     const prefiltered = Array.isArray(run.data.prefiltered_candidates) ? run.data.prefiltered_candidates : [];
 
     for (const candidate of accepted) {
-      candidates.push(normalizeCandidate(run, candidate, reviewState, reviewHistory, "accepted"));
+      candidates.push(normalizeCandidate(run, candidate, reviewState, reviewHistory, publishedLookup, "accepted"));
     }
 
     if (accepted.length === 0 && prefiltered.length > 0) {
       for (const candidate of prefiltered) {
-        candidates.push(normalizeCandidate(run, candidate, reviewState, reviewHistory, "prefiltered"));
+        candidates.push(normalizeCandidate(run, candidate, reviewState, reviewHistory, publishedLookup, "prefiltered"));
       }
     }
   }
@@ -1108,6 +1277,8 @@ app.post("/api/review/candidates/:key/publish", (req, res) => {
     reviewedAt: previousDecision?.reviewedAt ?? now,
     draft: candidate.draft,
     published,
+    lastUnpublishedAt: previousDecision?.lastUnpublishedAt ?? "",
+    lastUnpublishReason: previousDecision?.lastUnpublishReason ?? "",
   };
   writeReviewState(state);
 
@@ -1131,7 +1302,8 @@ app.post("/api/review/candidates/:key/publish", (req, res) => {
   res.json({ candidate: refreshed, published });
 });
 
-app.post("/api/review/candidates/:key/unpublish", (req, res) => {
+app.post("/api/review/candidates/:key/publish-controls", (req, res) => {
+  const action = typeof req.body?.action === "string" ? req.body.action : "";
   const candidates = getAllCandidates();
   const candidate = candidates.find((item) => item.key === req.params.key);
   if (!candidate) {
@@ -1141,6 +1313,75 @@ app.post("/api/review/candidates/:key/unpublish", (req, res) => {
 
   if (!candidate.published) {
     res.status(400).json({ error: "Candidate is not published" });
+    return;
+  }
+
+  const now = new Date().toISOString();
+  const reviewer = req.adminSession?.username || ADMIN_USERNAME;
+  const state = readReviewState();
+  const previousDecision = state.decisions[req.params.key] ?? {};
+  let published = candidate.published;
+  let historyNote = "";
+
+  if (action === "move_up") {
+    published = movePublishedCandidate(candidate, candidate.published, "up");
+    historyNote = "发布排序上移";
+  } else if (action === "move_down") {
+    published = movePublishedCandidate(candidate, candidate.published, "down");
+    historyNote = "发布排序下移";
+  } else if (action === "pin") {
+    published = setPublishedPin(candidate, candidate.published, true);
+    historyNote = "已置顶";
+  } else if (action === "unpin") {
+    published = setPublishedPin(candidate, candidate.published, false);
+    historyNote = "已取消置顶";
+  } else {
+    res.status(400).json({ error: "Invalid publish control action" });
+    return;
+  }
+
+  updateStateDecision(state, req.params.key, {
+    ...previousDecision,
+    published,
+    reviewer,
+  });
+  writeReviewState(state);
+
+  appendReviewHistory({
+    candidateKey: req.params.key,
+    candidateId: candidate.candidateId,
+    title: candidate.title,
+    status: candidate.status,
+    notes: `${historyNote}（位置 ${published.position ?? "?"}）`,
+    reviewer,
+    reviewedAt: now,
+    runFileName: candidate.runFileName,
+    sourceUrl: candidate.sourceUrl,
+    draftFilePath: candidate.draft?.filePath ?? "",
+    draftType: candidate.draft?.type,
+    publishedFilePath: published.filePath,
+    publicPath: published.publicPath,
+  });
+
+  const refreshed = getAllCandidates().find((item) => item.key === req.params.key);
+  res.json({ candidate: refreshed, published });
+});
+
+app.post("/api/review/candidates/:key/unpublish", (req, res) => {
+  const reason = typeof req.body?.reason === "string" ? req.body.reason.trim() : "";
+  const candidates = getAllCandidates();
+  const candidate = candidates.find((item) => item.key === req.params.key);
+  if (!candidate) {
+    res.status(404).json({ error: "Candidate not found" });
+    return;
+  }
+
+  if (!candidate.published) {
+    res.status(400).json({ error: "Candidate is not published" });
+    return;
+  }
+  if (!reason) {
+    res.status(400).json({ error: "Unpublish reason is required" });
     return;
   }
 
@@ -1160,6 +1401,8 @@ app.post("/api/review/candidates/:key/unpublish", (req, res) => {
     reviewedAt: previousDecision?.reviewedAt ?? now,
     draft: previousDecision?.draft ?? candidate.draft ?? null,
     published: null,
+    lastUnpublishedAt: now,
+    lastUnpublishReason: reason,
   };
   writeReviewState(state);
 
@@ -1168,7 +1411,7 @@ app.post("/api/review/candidates/:key/unpublish", (req, res) => {
     candidateId: candidate.candidateId,
     title: candidate.title,
     status: candidate.status,
-    notes: `已撤回发布：${previousPublished.publicPath}`,
+    notes: `已撤回发布：${previousPublished.publicPath}｜原因：${reason}`,
     reviewer,
     reviewedAt: now,
     runFileName: candidate.runFileName,
@@ -1206,12 +1449,22 @@ app.post("/api/review/candidates/:key/decision", (req, res) => {
   const previousDecision = state.decisions[req.params.key] ?? null;
   let draft = previousDecision?.draft ?? null;
   let published = previousDecision?.published ?? null;
+  let lastUnpublishedAt = previousDecision?.lastUnpublishedAt ?? "";
+  let lastUnpublishReason = previousDecision?.lastUnpublishReason ?? "";
+  let historyNotes = notes;
 
   if (status === "approved_source_note" || status === "approved_recipe") {
     draft = writeDraftFile(candidate, status, notes, reviewer, now, previousDecision?.draft);
   } else if ((status === "rejected" || status === "archived") && previousDecision?.published) {
+    const autoUnpublishReason =
+      notes.trim() || (status === "rejected" ? "因审核拒绝自动下线" : "因归档处理自动下线");
     unpublishCandidate(candidate, previousDecision.published);
     published = null;
+    lastUnpublishedAt = now;
+    lastUnpublishReason = autoUnpublishReason;
+    historyNotes = notes.trim()
+      ? `${notes.trim()}｜已自动下线：${autoUnpublishReason}`
+      : `已自动下线：${autoUnpublishReason}`;
   }
 
   state.decisions[req.params.key] = {
@@ -1221,6 +1474,8 @@ app.post("/api/review/candidates/:key/decision", (req, res) => {
     reviewedAt: now,
     draft,
     published,
+    lastUnpublishedAt,
+    lastUnpublishReason,
   };
   writeReviewState(state);
 
@@ -1229,7 +1484,7 @@ app.post("/api/review/candidates/:key/decision", (req, res) => {
     candidateId: candidate.candidateId,
     title: candidate.title,
     status,
-    notes,
+    notes: historyNotes,
     reviewer,
     reviewedAt: now,
     runFileName: candidate.runFileName,

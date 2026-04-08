@@ -13,15 +13,33 @@ import { featuredSourceNoteIds, sourceNotes } from "@/source-notes";
 
 const heroRecipeIds = ["C0", "C4", "E1"];
 
+function prioritizeByPublishedId<T extends { id: string }>(
+  items: T[],
+  publishedPrefix: string,
+  fallbackIds: string[],
+  limit: number,
+) {
+  const published = items.filter((item) => item.id.startsWith(publishedPrefix));
+  const fallback = items.filter((item) => fallbackIds.includes(item.id));
+  const merged = [...published, ...fallback];
+  const unique = new Map(merged.map((item) => [item.id, item]));
+  return Array.from(unique.values()).slice(0, limit);
+}
+
 export function HomePage() {
   const skillUrl =
     typeof window !== "undefined" ? `${window.location.origin}/skill.md` : "/skill.md";
   const skillInstruction = `Read ${skillUrl} and use AuraClaw according to the instructions in that file.`;
-  const featuredRecipes = recipes.filter((recipe) => heroRecipeIds.includes(recipe.id));
-  const extraRecipes = recipes.filter(
-    (recipe) => highlightedRecipeIds.includes(recipe.id) && !heroRecipeIds.includes(recipe.id),
-  );
-  const featuredSources = sourceNotes.filter((note) => featuredSourceNoteIds.includes(note.id));
+  const featuredRecipes = prioritizeByPublishedId(recipes, "PUB-RCP-", heroRecipeIds, 3);
+  const featuredRecipeIds = new Set(featuredRecipes.map((recipe) => recipe.id));
+  const extraRecipes = recipes
+    .filter(
+      (recipe) =>
+        !featuredRecipeIds.has(recipe.id) &&
+        (recipe.id.startsWith("PUB-RCP-") || highlightedRecipeIds.includes(recipe.id)),
+    )
+    .slice(0, 3);
+  const featuredSources = prioritizeByPublishedId(sourceNotes, "PUB-SRC-", featuredSourceNoteIds, 3);
 
   return (
     <Layout>
