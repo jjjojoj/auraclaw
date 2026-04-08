@@ -71,3 +71,77 @@ export interface StarterPackQuestion {
   title: string;
   answer: string;
 }
+
+export interface SourceNote {
+  id: string;
+  title: string;
+  siteName: string;
+  sourceUrl: string;
+  contentType: string;
+  boardFit: TrackId[];
+  summary: string;
+  keyPoints: string[];
+  recommendedFor: string[];
+  newbieFriendly: boolean;
+  needsManualReview: boolean;
+  citationMode: string;
+  reuseTargets: string[];
+  lastChecked: string;
+  notes: string;
+}
+
+export type ReviewStatus =
+  | "pending"
+  | "approved_source_note"
+  | "approved_recipe"
+  | "rejected"
+  | "archived";
+
+export interface ReviewHistoryEntry {
+  candidateKey: string;
+  candidateId: string;
+  title: string;
+  status: ReviewStatus;
+  notes: string;
+  reviewer: string;
+  reviewedAt: string;
+  runFileName: string;
+  sourceUrl: string;
+}
+
+export interface ReviewCandidate {
+  key: string;
+  candidateId: string;
+  runFileName: string;
+  runAt: string;
+  collector: string;
+  title: string;
+  type: string;
+  sourceName: string;
+  sourceUrl: string;
+  contentType: string;
+  boardFit: TrackId[];
+  whyItMatters: string;
+  oneLineSummary: string;
+  suggestedRecipeTitle: string;
+  suggestedAngle: string;
+  confidence: string;
+  needsManualReview: boolean;
+  status: ReviewStatus;
+  notes: string;
+  reviewer: string;
+  reviewedAt: string;
+  history: ReviewHistoryEntry[];
+}
+
+export interface ReviewSummary {
+  totalCandidates: number;
+  latestRunAt: string;
+  counts: Record<ReviewStatus, number>;
+}
+
+export interface AdminSession {
+  username: string;
+  authenticatedAt: string;
+  expiresAt: string;
+}

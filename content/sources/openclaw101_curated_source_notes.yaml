@@ -1,0 +1,366 @@
+generated_at: 2026-04-08
+status: active
+origin_repo:
+  name: openclaw101
+  url: https://github.com/mengjian-github/openclaw101
+  summary: >
+    一个中文 OpenClaw 资源聚合仓库。对 AuraClaw 最有价值的不是整篇原文，
+    而是它的资源分类、中文来源清单和 7 天学习路径骨架。
+
+source_notes:
+  - id: OC101-001
+    title: OpenClaw 101 仓库结构与来源分类法
+    site_name: GitHub / openclaw101
+    source_url: https://github.com/mengjian-github/openclaw101
+    content_type: source_map
+    board_fit:
+      - care
+      - extension
+      - dialogue
+      - opc
+    summary: >
+      最适合拿来做 AuraClaw 的来源索引和内容分类参考。它把资源拆成官方、入门部署、平台接入、
+      技能开发、视频、深度文章、工具与插件、云平台部署、玩法与场景。
+    key_points:
+      - src/data/resources.ts 是整站资源数据库，适合反哺 AuraClaw 的来源地图
+      - content/days 是 7 天学习路径，适合拿来做起步路线骨架
+      - content/guides/getting-started.mdx 适合做最小入门叙事参考
+    recommended_for:
+      - 内容来源整理
+      - 起步路线设计
+      - 平台接入梳理
+    newbie_friendly: true
+    needs_manual_review: false
+    citation_mode: structured_rewrite
+    reuse_targets:
+      - track_page
+      - recipe_page
+      - source_index
+    last_checked: 2026-04-08
+    notes: >
+      不适合整站搬运。更适合作为“来源的来源”，帮 AuraClaw 继续长内容。
+
+  - id: OC101-002
+    title: 第 1 天：初识 OpenClaw
+    site_name: GitHub / openclaw101
+    source_url: https://github.com/mengjian-github/openclaw101/blob/main/content/days/day1.md
+    content_type: learning_path
+    board_fit:
+      - care
+    summary: >
+      最值得借鉴的是“先建立 AI 助手心智，再进入安装和能力”这个顺序。
+      它适合反哺 AuraClaw 的 30 分钟起步包。
+    key_points:
+      - 先区分 AI 助手和聊天机器人
+      - 先让用户想清楚自己每天重复做的事
+      - 第一天不强调配置，而强调目标和预期
+    recommended_for:
+      - 30 分钟起步包
+      - 产后护理路线图
+    newbie_friendly: true
+    needs_manual_review: false
+    citation_mode: summary
+    reuse_targets:
+      - track_page
+      - recipe_page
+    last_checked: 2026-04-08
+    notes: >
+      适合拿“用户心智顺序”，不适合直接沿用“小墨”这种人格化叙事。
+
+  - id: OC101-003
+    title: 第 4 天：接入你的数字生活
+    site_name: GitHub / openclaw101
+    source_url: https://github.com/mengjian-github/openclaw101/blob/main/content/days/day4.md
+    content_type: learning_path
+    board_fit:
+      - care
+      - extension
+    summary: >
+      这一天的价值在于它明确把 Gmail、日历、搜索、浏览器能力放在“从能聊天到能办事”的转折点。
+      很适合反哺 AuraClaw 的能力扩展和平台接入叙事。
+    key_points:
+      - 能力扩展的本质是给 OpenClaw 接上“手和眼睛”
+      - Gmail、Calendar、Search、Browser 是从玩具到工具的分水岭
+      - 先接入，再测试，再进入真实工作流
+    recommended_for:
+      - 飞书 / 钉钉 / 企微接入后的第一条工作流
+      - 浏览器控制与抓取增强
+    newbie_friendly: true
+    needs_manual_review: false
+    citation_mode: structured_rewrite
+    reuse_targets:
+      - track_page
+      - recipe_page
+    last_checked: 2026-04-08
+    notes: >
+      这条不直接等于平台接入教程，但很适合拿来做“接入后的第一步”。
+
+  - id: OC101-004
+    title: 第 7 天：进阶玩法与成长路线
+    site_name: GitHub / openclaw101
+    source_url: https://github.com/mengjian-github/openclaw101/blob/main/content/days/day7.md
+    content_type: learning_path
+    board_fit:
+      - opc
+      - extension
+    summary: >
+      适合拿来做 AuraClaw 后半段的长期成长路线。重点不是“毕业”，而是把技能、自定义能力、
+      多设备协作、长期成长放进一条顺的进阶路径里。
+    key_points:
+      - 先回顾 7 天旅程，再进入进阶玩法
+      - 自定义 Skill 是成长路线的一部分
+      - Nodes、多设备协作和长期扩展适合放在更后面
+    recommended_for:
+      - 一人内容公司骨架
+      - 一人情报公司骨架
+      - 长期成长路线
+    newbie_friendly: false
+    needs_manual_review: false
+    citation_mode: summary
+    reuse_targets:
+      - track_page
+      - recipe_page
+      - source_index
+    last_checked: 2026-04-08
+    notes: >
+      很适合做 OPC 的“毕业后继续养大”的路线提示。
+
+  - id: OC101-005
+    title: 腾讯云 — OpenClaw 接入飞书保姆级教程
+    site_name: 腾讯云
+    source_url: https://cloud.tencent.com/developer/article/2625073
+    content_type: tutorial
+    board_fit:
+      - care
+    summary: >
+      这是目前最适合反哺 AuraClaw“飞书接入后第一条工作流”的中文平台接入来源之一。
+    key_points:
+      - 覆盖 Lighthouse 一键部署
+      - 覆盖飞书机器人接入全流程
+      - 非常适合作为中文协作工作流的前置来源
+    recommended_for:
+      - 飞书接入
+      - 中文协作场景
+    newbie_friendly: true
+    needs_manual_review: true
+    citation_mode: summary
+    reuse_targets:
+      - recipe_page
+      - source_index
+    last_checked: 2026-04-08
+    notes: >
+      最适合拿来支持“先判断接入状态，再跑第一条团队同步工作流”。
+
+  - id: OC101-006
+    title: 阿里云 — 部署 OpenClaw 构建钉钉 AI 助理
+    site_name: 阿里云
+    source_url: https://help.aliyun.com/zh/simple-application-server/use-cases/quickly-deploy-and-use-openclaw
+    content_type: tutorial
+    board_fit:
+      - care
+    summary: >
+      适合支持钉钉方向的平台接入说明，尤其适合国内用户的轻量服务器部署路径。
+    key_points:
+      - 一键部署
+      - 可视化配置面板
+      - 钉钉接入
+    recommended_for:
+      - 钉钉接入
+      - 平台接入说明
+    newbie_friendly: true
+    needs_manual_review: true
+    citation_mode: summary
+    reuse_targets:
+      - recipe_page
+      - source_index
+    last_checked: 2026-04-08
+    notes: >
+      很适合和飞书、企微来源一起组成“中文平台接入三件套”。
+
+  - id: OC101-007
+    title: 阿里云 — AppFlow 集成企业微信
+    site_name: 阿里云
+    source_url: https://help.aliyun.com/zh/simple-application-server/use-cases/openclaw-enterprise-wechat-integration
+    content_type: tutorial
+    board_fit:
+      - care
+    summary: >
+      适合支持企微接入方向，尤其适合企业协作和群聊直接交互场景。
+    key_points:
+      - 企业微信接入
+      - AppFlow 连接器
+      - 适合企业协作
+    recommended_for:
+      - 企业微信接入
+      - 中文平台协作
+    newbie_friendly: true
+    needs_manual_review: true
+    citation_mode: summary
+    reuse_targets:
+      - recipe_page
+      - source_index
+    last_checked: 2026-04-08
+    notes: >
+      对 AuraClaw 的价值不是整篇教程，而是“企微这条路怎么纳入第一条工作流”。
+
+  - id: OC101-008
+    title: OpenClaw 7 天入门指南 — 飞书知识库
+    site_name: OpenClaw 101
+    source_url: https://my.feishu.cn/wiki/YkWgwqSchi9xW3kEuZscAm0lnFf
+    content_type: learning_path
+    board_fit:
+      - care
+      - extension
+      - opc
+    summary: >
+      是 openclaw101 仓库外部承载的系统化学习路径来源，适合 AuraClaw 拿来做“长期成长路线”索引。
+    key_points:
+      - 每天一个主题
+      - 从认识到进阶的系统化路径
+      - 很适合作为用户继续深挖的延伸来源
+    recommended_for:
+      - 学习路径索引
+      - 起步路线
+      - 进阶路线
+    newbie_friendly: true
+    needs_manual_review: true
+    citation_mode: link
+    reuse_targets:
+      - source_index
+    last_checked: 2026-04-08
+    notes: >
+      适合做 AuraClaw 的“继续阅读”来源，不适合取代 AuraClaw 自己的经验包。
+
+  - id: OC101-009
+    title: 搬主题 — 一键安装部署超详细图文教程
+    site_name: 搬主题
+    source_url: https://www.banzhuti.com/openclaw-moltbot-clawdbot-tutorial.html
+    content_type: tutorial
+    board_fit:
+      - care
+    summary: >
+      非常适合支持“飞书 / 钉钉 / 微信 / Web”这类国内平台集成的路径判断。
+    key_points:
+      - 四种集成方式
+      - 国内用户友好
+      - 图文说明完整
+    recommended_for:
+      - 平台接入说明
+      - 中文协作入口
+    newbie_friendly: true
+    needs_manual_review: true
+    citation_mode: summary
+    reuse_targets:
+      - recipe_page
+      - source_index
+    last_checked: 2026-04-08
+    notes: >
+      很适合拿来补“如果平台还没接好，最小建议该怎么说”。
+
+  - id: OC101-010
+    title: 菜鸟教程 — OpenClaw（Clawdbot）完整教程
+    site_name: 菜鸟教程
+    source_url: https://www.runoob.com/ai-agent/openclaw-clawdbot-tutorial.html
+    content_type: tutorial
+    board_fit:
+      - care
+    summary: >
+      很适合作为中文起步路径的补充来源，尤其适合帮助 AuraClaw 补最小安装和开发模式描述。
+    key_points:
+      - 从源码拉取到 build 的完整过程
+      - 涵盖开发模式
+      - 中文新手可读性较强
+    recommended_for:
+      - 30 分钟起步包
+      - 安装说明补充
+    newbie_friendly: true
+    needs_manual_review: true
+    citation_mode: summary
+    reuse_targets:
+      - recipe_page
+      - source_index
+    last_checked: 2026-04-08
+    notes: >
+      不适合大段照搬，更适合拿来补“用户如果没装稳，下一步该查什么”。
+
+  - id: OC101-011
+    title: 阿里云百炼 — OpenClaw 接入指南
+    site_name: 阿里云百炼
+    source_url: https://help.aliyun.com/zh/model-studio/openclaw
+    content_type: tutorial
+    board_fit:
+      - extension
+      - opc
+    summary: >
+      这是很有价值的国内模型接入来源，适合支持 AuraClaw 后续的能力扩展和进阶路线。
+    key_points:
+      - Qwen / DeepSeek / Kimi 等模型接入
+      - dashboard 配置
+      - 地域差异说明
+    recommended_for:
+      - 模型接入
+      - 国内用户路径
+    newbie_friendly: false
+    needs_manual_review: true
+    citation_mode: summary
+    reuse_targets:
+      - recipe_page
+      - source_index
+    last_checked: 2026-04-08
+    notes: >
+      适合放进后续“能力扩展”或“长期成长路线”，不建议作为第一次成功的起步内容。
+
+  - id: OC101-012
+    title: GitHub — 哈喽！龙虾（Hello Claw）
+    site_name: GitHub
+    source_url: https://github.com/datawhalechina/hello-claw
+    content_type: guide
+    board_fit:
+      - care
+      - extension
+    summary: >
+      这是体系化中文开源教程，适合做 AuraClaw 的中文来源补充，尤其适合“领养第一只 Claw”这种起步心智。
+    key_points:
+      - DataWhale 出品
+      - 中文体系化开源教程
+      - 覆盖架构、Skills、平台接入和部署
+    recommended_for:
+      - 中文起步路线
+      - 学习路径索引
+    newbie_friendly: true
+    needs_manual_review: true
+    citation_mode: summary
+    reuse_targets:
+      - source_index
+      - track_page
+    last_checked: 2026-04-08
+    notes: >
+      更适合作为 AuraClaw 的“继续学习”来源，不适合直接替代 AuraClaw 的经验包。
+
+  - id: OC101-013
+    title: 飞书官方 — 一文完全搞懂 Clawd Bot
+    site_name: 飞书官网
+    source_url: https://www.feishu.cn/content/article/7602519239445974205
+    content_type: deep_dive
+    board_fit:
+      - extension
+      - opc
+    summary: >
+      非常适合反哺 AuraClaw 的架构理解、安全提醒和团队协作视角，尤其适合中文平台接入后的进一步说明。
+    key_points:
+      - Gateway-Node 架构
+      - 安全团队视角
+      - 部署方案与成本分析
+    recommended_for:
+      - 能力扩展说明
+      - 进阶理解
+      - 团队协作场景
+    newbie_friendly: false
+    needs_manual_review: true
+    citation_mode: summary
+    reuse_targets:
+      - recipe_page
+      - source_index
+    last_checked: 2026-04-08
+    notes: >
+      适合做进阶补充，不适合做起步内容。

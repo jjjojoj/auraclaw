@@ -6,3 +6,16 @@ vite.config.js
 vite.config.d.ts
 .DS_Store
 .gstack/
+.env
+.env.local
+*.log
+
+# Runtime content pipeline data
+content/inbox/source-harvest/*.yaml
+!content/inbox/source-harvest/.gitkeep
+content/review/state.json
+content/review/history.jsonl
+
+# Local scout workspaces or temporary exports
+tmp/
+temp/

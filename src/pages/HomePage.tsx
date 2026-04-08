@@ -9,8 +9,9 @@ import { TrackCard } from "@/components/TrackCard";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { highlightedRecipeIds, recipes, tracks } from "@/data";
+import { featuredSourceNoteIds, sourceNotes } from "@/source-notes";
 
-const heroRecipeIds = ["C1", "E1", "D1"];
+const heroRecipeIds = ["C0", "C4", "E1"];
 
 export function HomePage() {
   const skillUrl =
@@ -20,6 +21,7 @@ export function HomePage() {
   const extraRecipes = recipes.filter(
     (recipe) => highlightedRecipeIds.includes(recipe.id) && !heroRecipeIds.includes(recipe.id),
   );
+  const featuredSources = sourceNotes.filter((note) => featuredSourceNoteIds.includes(note.id));
 
   return (
     <Layout>
@@ -52,6 +54,8 @@ export function HomePage() {
               <span><strong className="font-semibold text-[color:var(--foreground)]">{recipes.length}</strong> 个经验包</span>
               <span className="h-px w-4 bg-[color:var(--border)]" />
               <span><strong className="font-semibold text-[color:var(--foreground)]">{tracks.length}</strong> 条培养路径</span>
+              <span className="h-px w-4 bg-[color:var(--border)]" />
+              <span><strong className="font-semibold text-[color:var(--foreground)]">{sourceNotes.length}</strong> 条来源索引</span>
               <span className="h-px w-4 bg-[color:var(--border)]" />
               <span>每个经验包均含验证清单</span>
               <span className="h-px w-4 bg-[color:var(--border)]" />
@@ -180,6 +184,49 @@ export function HomePage() {
           <div>
             {tracks.map((track, i) => (
               <TrackCard key={track.id} track={track} index={i} />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="section-space">
+        <div className="grid gap-8 lg:grid-cols-[1fr_2fr] lg:items-start">
+          <div>
+            <SectionHeading
+              eyebrow="可信来源"
+              title="这些经验不是凭空写出来的"
+              body="我们已经开始把学习路径、中文平台接入和国内部署来源整理成来源索引。"
+            />
+            <div className="mt-6">
+              <Button asChild variant="outline" className="rounded-full px-5">
+                <Link to="/sources">进入来源索引</Link>
+              </Button>
+            </div>
+          </div>
+
+          <div className="grid gap-px bg-[color:var(--border)] lg:grid-cols-3">
+            {featuredSources.slice(0, 3).map((note) => (
+              <a
+                key={note.id}
+                href={note.sourceUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="group flex h-full flex-col bg-[color:var(--panel)] p-6 transition-shadow hover:shadow-[0_4px_20px_0_rgba(15,15,14,0.08)]"
+              >
+                <div className="mb-4 flex flex-wrap gap-2">
+                  <span className="eyebrow">{note.siteName}</span>
+                  <span className="inline-flex items-center rounded-sm border border-[color:var(--border-strong)] px-2 py-0.5 text-[10px] font-medium uppercase tracking-[0.14em] text-[color:var(--muted-foreground)]">
+                    {note.contentType.replace("_", " ")}
+                  </span>
+                </div>
+                <h3 className="font-serif text-2xl leading-snug tracking-[-0.02em] text-[color:var(--foreground)]">
+                  {note.title}
+                </h3>
+                <p className="mt-3 flex-1 text-sm leading-7 text-[color:var(--muted-foreground)]">{note.summary}</p>
+                <div className="mt-5 border-t border-[color:var(--border)] pt-4 text-sm font-medium text-[color:var(--foreground)] transition-opacity group-hover:opacity-70">
+                  查看原始来源 →
+                </div>
+              </a>
             ))}
           </div>
         </div>

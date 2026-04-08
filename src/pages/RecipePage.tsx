@@ -286,6 +286,74 @@ export function RecipePage() {
               </AccordionContent>
             </AccordionItem>
 
+            <AccordionItem value="execution">
+              <AccordionTrigger className="text-sm">它会怎么执行</AccordionTrigger>
+              <AccordionContent>
+                <ul className="space-y-2">
+                  {executionFlow.map((item) => (
+                    <li key={item} className="flex gap-2 text-sm leading-7">
+                      <span className="mt-2.5 h-1 w-1 shrink-0 rounded-full bg-[color:var(--foreground)]" />
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </AccordionContent>
+            </AccordionItem>
+
+            {recipe.outputPreview ? (
+              <AccordionItem value="preview">
+                <AccordionTrigger className="text-sm">结果预览</AccordionTrigger>
+                <AccordionContent>
+                  <pre className="rounded-md border border-[color:var(--border)] bg-[color:var(--panel-muted)] p-4 text-xs leading-6 whitespace-pre-wrap">
+                    <code>{recipe.outputPreview}</code>
+                  </pre>
+                </AccordionContent>
+              </AccordionItem>
+            ) : null}
+
+            {recipe.dependencies?.length ? (
+              <AccordionItem value="dependencies">
+                <AccordionTrigger className="text-sm">会用到什么</AccordionTrigger>
+                <AccordionContent>
+                  <ul className="space-y-4">
+                    {recipe.dependencies.map((dependency) => (
+                      <li key={`${dependency.name}-${dependency.source}`}>
+                        <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[color:var(--foreground)] mb-1">
+                          {dependency.kind}
+                        </p>
+                        <p className="text-sm font-medium text-[color:var(--foreground)]">{dependency.name}</p>
+                        <p className="mt-1 text-sm leading-7 text-[color:var(--muted-foreground)]">{dependency.summary}</p>
+                        <a
+                          href={dependency.source}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="mt-2 inline-flex text-sm font-medium text-[color:var(--foreground)] underline underline-offset-4"
+                        >
+                          查看来源
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </AccordionContent>
+              </AccordionItem>
+            ) : null}
+
+            {recipe.sourceTips?.length ? (
+              <AccordionItem value="sources">
+                <AccordionTrigger className="text-sm">来源提醒</AccordionTrigger>
+                <AccordionContent>
+                  <ul className="space-y-2">
+                    {recipe.sourceTips.map((item) => (
+                      <li key={item} className="flex gap-2 text-sm leading-7">
+                        <span className="mt-2.5 h-1 w-1 shrink-0 rounded-full bg-[color:var(--muted-foreground)]" />
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+                </AccordionContent>
+              </AccordionItem>
+            ) : null}
+
             <AccordionItem value="pitfalls">
               <AccordionTrigger className="text-sm">常见踩坑</AccordionTrigger>
               <AccordionContent>

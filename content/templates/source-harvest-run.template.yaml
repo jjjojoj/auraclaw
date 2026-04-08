@@ -1,0 +1,35 @@
+run_at: "2026-04-08T10:00:00+08:00"
+collector: "openclaw"
+status: "completed"
+focus_theme: "OpenClaw 中文生态 / 能力扩展 / 平台接入 / OPC"
+save_path: "/Users/joe/Documents/New project/auraclaw/content/inbox/source-harvest/2026-04-08_1000.yaml"
+
+summary:
+  scanned_sources_count: 0
+  accepted_candidates_count: 0
+  rejected_candidates_count: 0
+  notes: ""
+
+accepted_candidates:
+  - id: "CAND-001"
+    type: "recipe_candidate"
+    title: ""
+    source_name: ""
+    source_url: ""
+    content_type: "tutorial"
+    board_fit:
+      - "care"
+    why_it_matters: ""
+    one_line_summary: ""
+    suggested_recipe_title: ""
+    suggested_angle: ""
+    confidence: "high"
+    needs_manual_review: true
+
+rejected_candidates:
+  - title: ""
+    source_url: ""
+    reason: ""
+
+next_actions:
+  - ""

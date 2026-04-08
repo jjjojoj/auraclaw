@@ -19,6 +19,7 @@ export function Layout({
     { to: "/", label: "首页" },
     { to: "/starter-pack", label: "Starter Pack" },
     { to: "/tracks/care", label: "四条路径" },
+    { to: "/sources", label: "来源索引" },
     { to: "/about", label: "关于" },
   ];
 
@@ -27,13 +28,11 @@ export function Layout({
       <header className="sticky top-0 z-40 -mx-4 px-4 pt-4 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8">
         <div className="rounded-[24px] border border-[color:var(--border-strong)] bg-[color:var(--background)]/94 p-3 shadow-[0_18px_40px_-28px_rgba(15,15,14,0.18)] backdrop-blur">
           <div className="grid gap-3 md:grid-cols-[auto_1fr_auto] md:items-center">
-            <NavLink className="min-w-max" to="/">
-              <div className="rounded-[18px] border border-[color:var(--border)] bg-[color:var(--panel)] px-4 py-3">
-                <span className="brand-wordmark block text-[color:var(--foreground)]">AuraClaw</span>
-              </div>
+            <NavLink className="min-w-max px-2 py-3" to="/">
+              <span className="brand-wordmark block text-[color:var(--foreground)]">AuraClaw</span>
             </NavLink>
 
-            <nav className="hidden min-w-0 grid-cols-4 gap-1 rounded-[18px] border border-[color:var(--border)] bg-[color:var(--panel)] p-1 md:grid">
+            <nav className="hidden min-w-0 grid-cols-5 gap-1 rounded-[18px] border border-[color:var(--border)] bg-[color:var(--panel)] p-1 md:grid">
               {navItems.map((item) => (
                 <NavLink
                   key={item.to}

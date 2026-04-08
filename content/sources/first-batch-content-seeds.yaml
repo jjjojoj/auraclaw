@@ -1,0 +1,301 @@
+generated_at: 2026-03-28
+status: active
+purpose: >
+  首批优质内容线索库。这里记录的不是最终上线文案，而是从外部来源整理出来、
+  适合继续改写成 AuraClaw 经验包的高价值方向。
+
+content_seeds:
+  - id: CARE-001
+    title: 30分钟起步包：安装、onboard、第一条可执行任务
+    track_id: care
+    priority: P0
+    quality_signal: 新手需求最强，成功率最高，能直接建立信任感
+    source_mix:
+      - site_name: OpenClaw101.club
+        url: https://www.openclaw101.club/
+        role: 快速入门路径与小白分流
+      - site_name: Claw101
+        url: https://claw101.com/en
+        role: 章节化准备与部署路径
+    adaptation_goal: >
+      做成 AuraClaw 的第一条超低门槛经验包，不讲太多概念，只确保用户第一次真的跑通。
+    include_in_experience_pack:
+      - 准备环境的最小清单
+      - 第一次复制给 OpenClaw 的完整说明
+      - 成功验证方法
+      - 失败后的排查顺序
+    status: queued
+
+  - id: CARE-002
+    title: 飞书 / 钉钉 / 企微接入后的第一条工作流
+    track_id: care
+    priority: P0
+    quality_signal: 中文用户真实频率高，结果感强
+    source_mix:
+      - site_name: OpenClaw 中文社区
+        url: https://openclawcn.cc/
+        role: 中文平台接入与最佳实践
+      - site_name: Claw101 Blog
+        url: https://claw101.com/blog/manage-10-agents
+        role: 多平台接入与真实部署案例
+    adaptation_goal: >
+      不是只告诉用户“支持飞书”，而是直接给出接入后第一条值得执行的真实工作流。
+    include_in_experience_pack:
+      - 该接入解决什么问题
+      - 需要补的权限或前置
+      - 第一次测试建议
+      - 装好后最短怎么说
+    status: queued
+
+  - id: CARE-003
+    title: 会议纪要 + 后续待办整理起步包
+    track_id: care
+    priority: P0
+    quality_signal: 高频中文办公场景，适合建立“它真的有用”的感知
+    source_mix:
+      - site_name: OpenClaw 中文社区
+        url: https://openclawcn.cc/
+        role: 中文工作场景与办公平台
+      - site_name: OpenClaw101.club
+        url: https://www.openclaw101.club/
+        role: 小白友好内容组织
+    adaptation_goal: >
+      在现有会议纪要经验包基础上做深，把会议后十分钟的完整整理动作做成真正可交付版本。
+    include_in_experience_pack:
+      - 纪要模板
+      - 待办抽取
+      - 待确认事项识别
+      - 发飞书前自检
+    status: in_progress
+
+  - id: CARE-004
+    title: 学习资料转知识卡片与知识库归档
+    track_id: care
+    priority: P1
+    quality_signal: 学习型和创作者用户都能复用
+    source_mix:
+      - site_name: OpenClaw 中文社区
+        url: https://openclawcn.cc/
+        role: 笔记管理与知识整理场景
+      - site_name: OpenClaw Skills
+        url: https://openclawskills.net/
+        role: 新手可理解的技能陈列表达
+    adaptation_goal: >
+      从“做摘要”升级成“提炼卡片 + 入库建议 + 后续复习动作”。
+    include_in_experience_pack:
+      - 输入材料要求
+      - 卡片结构
+      - 可选的知识库归档目标
+      - 复习或分享两种输出模式
+    status: queued
+
+  - id: EXT-001
+    title: 浏览器控制与抓取增强经验包
+    track_id: extension
+    priority: P0
+    quality_signal: 这是用户最常撞墙、也是最容易感觉能力跃迁的方向
+    source_mix:
+      - site_name: Claw101
+        url: https://claw101.com/en
+        role: 浏览器控制与可落地场景
+      - site_name: awesome-openclaw-skills
+        url: https://github.com/VoltAgent/awesome-openclaw-skills
+        role: Browser & Automation 类别和安装模式
+    adaptation_goal: >
+      以“让 OpenClaw 获得更稳定的网页操作与抓取能力”为主题，
+      后续可继续接入 Scrapling 这类外部增强能力。
+    include_in_experience_pack:
+      - 为什么普通抓取会失败
+      - 什么时候该接能力
+      - 安装与验证步骤
+      - 失败时怎么回退
+    status: queued
+
+  - id: EXT-002
+    title: GitHub 自动化能力接入包
+    track_id: extension
+    priority: P0
+    quality_signal: 开发者和内容协作用户都能明显感受到价值
+    source_mix:
+      - site_name: awesome-openclaw-skills
+        url: https://github.com/VoltAgent/awesome-openclaw-skills
+        role: Git & GitHub 分类与安装路径
+      - site_name: OpenClaw Skills
+        url: https://openclawskills.net/
+        role: 安装流程表达与新手教育
+    adaptation_goal: >
+      不做“技能市场导览”，直接做成“让 OpenClaw 获得 GitHub 读写与协作能力”的完整经验包。
+    include_in_experience_pack:
+      - 读仓库
+      - 提 issue / 看 PR
+      - 基础权限边界
+      - 最短说法
+    status: queued
+
+  - id: EXT-003
+    title: 语音转文字 + 笔记入库包
+    track_id: extension
+    priority: P1
+    quality_signal: 面向中文场景，贴近日常记录与复盘
+    source_mix:
+      - site_name: OpenClaw 中文社区
+        url: https://openclawcn.cc/
+        role: 语音、笔记、中文工作流
+      - site_name: awesome-openclaw-skills
+        url: https://github.com/VoltAgent/awesome-openclaw-skills
+        role: Speech & Transcription / Notes & PKM 类别
+    adaptation_goal: >
+      做成“语音输入 -> 文字整理 -> 知识归档”的能力链，而不是单点转写。
+    include_in_experience_pack:
+      - 适合的录音输入
+      - 转写后的整理动作
+      - 入库建议
+      - 复用方式
+    status: queued
+
+  - id: EXT-004
+    title: 日历与提醒能力接入包
+    track_id: extension
+    priority: P1
+    quality_signal: 与定时任务表达校准天然联动
+    source_mix:
+      - site_name: awesome-openclaw-skills
+        url: https://github.com/VoltAgent/awesome-openclaw-skills
+        role: Calendar & Scheduling 类别
+      - site_name: OpenClaw Skill
+        url: https://openclawskill.ai/
+        role: 依赖说明、metadata、安装思路
+    adaptation_goal: >
+      让用户能把“提醒我”“帮我安排”这类模糊需求升级成真正可落地的时间型动作。
+    include_in_experience_pack:
+      - 接入前提
+      - 创建提醒或日程的方法
+      - 校验动作
+      - 失败回报格式
+    status: queued
+
+  - id: DIA-001
+    title: 定时任务表达校准包
+    track_id: dialogue
+    priority: P0
+    quality_signal: 这是最典型的“会说一句话但不会说成可执行结构”的场景
+    source_mix:
+      - site_name: Claw101
+        url: https://claw101.com/en
+        role: 自动化与可执行工作流启发
+      - site_name: OpenClaw Skill
+        url: https://openclawskill.ai/
+        role: 依赖、安装、测试的表达方式
+    adaptation_goal: >
+      把“每天晚上八点帮我做个任务”升级成目标、时间、写入、校验、状态汇报完整结构。
+    include_in_experience_pack:
+      - 模糊表达示例
+      - 校准后表达
+      - 为什么这样说更稳
+      - 让用户逐步学会的讲解
+    status: in_progress
+
+  - id: DIA-002
+    title: 行业情报收集表达校准包
+    track_id: dialogue
+    priority: P0
+    quality_signal: 与你最初的项目起点高度一致
+    source_mix:
+      - site_name: Claw101 Blog
+        url: https://claw101.com/en/blog
+        role: 情报、自动巡检、真实项目拆解
+      - site_name: awesome-openclaw-skills
+        url: https://github.com/VoltAgent/awesome-openclaw-skills
+        role: Search & Research 类别
+    adaptation_goal: >
+      把“帮我爬信息”这种模糊需求，收成来源、时间范围、可信度、输出结构、后续跟踪都明确的任务。
+    include_in_experience_pack:
+      - 搜索范围
+      - 来源可信度要求
+      - 输出结构
+      - 不足信息时的回退逻辑
+    status: queued
+
+  - id: DIA-003
+    title: 多渠道发布任务表达校准包
+    track_id: dialogue
+    priority: P1
+    quality_signal: 容易和一人内容公司骨架串联
+    source_mix:
+      - site_name: Claw101 Blog
+        url: https://claw101.com/blog/manage-10-agents
+        role: 多平台接入、自动发布案例
+      - site_name: OpenClaw 中文社区
+        url: https://openclawcn.cc/
+        role: 中文平台与渠道感知
+    adaptation_goal: >
+      教用户把“帮我发到多个平台”说成渠道、格式、节奏、校验都清晰的结构化任务。
+    include_in_experience_pack:
+      - 渠道列表
+      - 每个平台的格式约束
+      - 发布前校验
+      - 发布失败的回报机制
+    status: queued
+
+  - id: OPC-001
+    title: 一人内容公司骨架
+    track_id: opc
+    priority: P0
+    quality_signal: 传播性强，符合当前中文语境热点
+    source_mix:
+      - site_name: Claw101 Blog
+        url: https://claw101.com/en/blog
+        role: 多实例与真实工作流
+      - site_name: awesome-openclaw-skills
+        url: https://github.com/VoltAgent/awesome-openclaw-skills
+        role: Marketing & Sales / Communication / Browser 类别
+    adaptation_goal: >
+      串起选题、调研、脚本、分发、复盘，形成 AuraClaw 自己的一人内容公司样板。
+    include_in_experience_pack:
+      - 角色划分
+      - 周期节奏
+      - 输入输出
+      - 最先起步的一条轻量路径
+    status: queued
+
+  - id: OPC-002
+    title: 一人行业情报台骨架
+    track_id: opc
+    priority: P0
+    quality_signal: 和 AuraClaw 自身气质最一致，最容易形成品牌特色
+    source_mix:
+      - site_name: Claw101 Blog
+        url: https://claw101.com/en/blog
+        role: 自动巡检、情报采集、真实运维场景
+      - site_name: awesome-openclaw-skills
+        url: https://github.com/VoltAgent/awesome-openclaw-skills
+        role: Search & Research / Browser & Automation / Data & Analytics
+    adaptation_goal: >
+      串起情报采集、去重、简报输出、继续跟进建议，形成可长期复用的单人情报工作台。
+    include_in_experience_pack:
+      - 采集对象
+      - 更新频率
+      - 简报模板
+      - 需要继续跟进的方向
+    status: queued
+
+  - id: OPC-003
+    title: 一人知识库运营台骨架
+    track_id: opc
+    priority: P1
+    quality_signal: 适合研究者、创作者和学习型用户
+    source_mix:
+      - site_name: OpenClaw 中文社区
+        url: https://openclawcn.cc/
+        role: 笔记、知识整理、中文场景
+      - site_name: OpenClaw Skill
+        url: https://openclawskill.ai/
+        role: SKILL.md、长期工作流、自然语言指令
+    adaptation_goal: >
+      串起资料采集、卡片化、知识归档和检索复用，形成轻量的一人知识库系统。
+    include_in_experience_pack:
+      - 素材入口
+      - 卡片结构
+      - 入库策略
+      - 周期性整理动作
+    status: queued
