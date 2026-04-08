@@ -32,6 +32,18 @@ const statusLabel: Record<ReviewStatus, string> = {
   archived: "已归档",
 };
 
+interface DraftPreview {
+  filePath: string;
+  fileName: string;
+  updatedAt: string;
+  content: string;
+  snapshots?: Array<{
+    fileName: string;
+    filePath: string;
+    updatedAt: string;
+  }>;
+}
+
 function formatTime(value: string) {
   if (!value) return "未记录";
   const date = new Date(value);
@@ -62,6 +74,8 @@ export function ReviewPage() {
   const [boardFilter, setBoardFilter] = useState<TrackId | "all">("all");
   const [query, setQuery] = useState("");
   const [notesDraft, setNotesDraft] = useState<Record<string, string>>({});
+  const [draftPreviews, setDraftPreviews] = useState<Record<string, DraftPreview | null>>({});
+  const [draftLoadingKey, setDraftLoadingKey] = useState("");
   const [savingKey, setSavingKey] = useState<string>("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -85,6 +99,7 @@ export function ReviewPage() {
       const data = await response.json();
       setCandidates(data.candidates ?? []);
       setSummary(data.summary ?? null);
+      setDraftPreviews({});
       setNotesDraft((current) => {
         const next = { ...current };
         for (const candidate of data.candidates ?? []) {
@@ -128,6 +143,34 @@ export function ReviewPage() {
       setError(err instanceof Error ? err.message : "保存失败");
     } finally {
       setSavingKey("");
+    }
+  }
+
+  async function toggleDraftPreview(candidate: ReviewCandidate) {
+    if (draftPreviews[candidate.key]) {
+      setDraftPreviews((current) => ({ ...current, [candidate.key]: null }));
+      return;
+    }
+
+    setDraftLoadingKey(candidate.key);
+    setError("");
+
+    try {
+      const response = await fetch(`/api/review/candidates/${candidate.key}/draft`);
+      if (response.status === 401) {
+        navigate("/admin/login", { replace: true });
+        return;
+      }
+      if (!response.ok) throw new Error("草稿预览读取失败");
+      const data = await response.json();
+      setDraftPreviews((current) => ({
+        ...current,
+        [candidate.key]: data.draft ?? null,
+      }));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "读取草稿失败");
+    } finally {
+      setDraftLoadingKey("");
     }
   }
 
@@ -245,6 +288,9 @@ export function ReviewPage() {
                   <div className="flex flex-wrap items-center gap-2">
                     <span className="eyebrow">{candidate.sourceName}</span>
                     <Badge variant="accent">{statusLabel[candidate.status]}</Badge>
+                    <span className="inline-flex items-center rounded-sm border border-[color:var(--border)] px-2 py-0.5 text-[10px] font-medium uppercase tracking-[0.14em] text-[color:var(--muted-foreground)]">
+                      {candidate.originLayer === "prefiltered" ? "预筛候选" : "GLM 通过"}
+                    </span>
                     <span className="inline-flex items-center rounded-sm border border-[color:var(--border-strong)] px-2 py-0.5 text-[10px] font-medium uppercase tracking-[0.14em] text-[color:var(--muted-foreground)]">
                       {candidate.type}
                     </span>
@@ -309,6 +355,28 @@ export function ReviewPage() {
                       打开原始来源
                     </a>
                   </div>
+
+                  {candidate.draft ? (
+                    <div className="border-t border-[color:var(--border)] pt-4">
+                      <p className="eyebrow mb-2">已生成草稿</p>
+                      <div className="space-y-2 text-sm leading-7 text-[color:var(--foreground)]">
+                        <p>{candidate.draft.fileName}</p>
+                        <p className="text-[color:var(--muted-foreground)]">{candidate.draft.filePath}</p>
+                        <p className="text-[color:var(--muted-foreground)]">
+                          最近生成：{formatTime(candidate.draft.updatedAt)}
+                        </p>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          className="rounded-full"
+                          disabled={draftLoadingKey === candidate.key}
+                          onClick={() => void toggleDraftPreview(candidate)}
+                        >
+                          {draftPreviews[candidate.key] ? "收起草稿预览" : "查看草稿预览"}
+                        </Button>
+                      </div>
+                    </div>
+                  ) : null}
                 </div>
 
                 <div className="space-y-4 border border-[color:var(--border)] bg-[color:var(--panel-muted)] p-4">
@@ -336,7 +404,7 @@ export function ReviewPage() {
                       className="justify-start rounded-full"
                     >
                       <CheckCheck className="h-4 w-4" />
-                      批准为来源索引
+                      批准并生成来源草稿
                     </Button>
                     <Button
                       disabled={savingKey === candidate.key}
@@ -344,7 +412,7 @@ export function ReviewPage() {
                       className="justify-start rounded-full"
                     >
                       <CheckCheck className="h-4 w-4" />
-                      批准为经验包
+                      批准并生成经验包草稿
                     </Button>
                     <Button
                       disabled={savingKey === candidate.key}
@@ -373,6 +441,44 @@ export function ReviewPage() {
                   </div>
                 </div>
               </div>
+
+              {draftPreviews[candidate.key] ? (
+                <div className="mt-6 border-t border-[color:var(--border)] pt-4">
+                  <div className="flex flex-wrap items-center justify-between gap-3">
+                    <div>
+                      <p className="eyebrow mb-2">草稿预览</p>
+                      <p className="text-sm text-[color:var(--muted-foreground)]">
+                        {draftPreviews[candidate.key]?.filePath}
+                      </p>
+                    </div>
+                    <p className="text-xs text-[color:var(--muted-foreground)]">
+                      最近生成：{formatTime(draftPreviews[candidate.key]?.updatedAt || "")}
+                    </p>
+                  </div>
+
+                  <pre className="mt-4 overflow-x-auto border border-[color:var(--border)] bg-[color:var(--panel-muted)] p-4 text-xs leading-6 text-[color:var(--foreground)] whitespace-pre-wrap">
+                    {draftPreviews[candidate.key]?.content}
+                  </pre>
+
+                  {(draftPreviews[candidate.key]?.snapshots?.length ?? 0) > 0 ? (
+                    <div className="mt-4">
+                      <p className="eyebrow mb-2">历史快照</p>
+                      <div className="space-y-2 text-sm leading-7 text-[color:var(--muted-foreground)]">
+                        {draftPreviews[candidate.key]?.snapshots?.map((snapshot) => (
+                          <div
+                            key={`${snapshot.filePath}-${snapshot.updatedAt}`}
+                            className="border border-[color:var(--border)] bg-[color:var(--panel-muted)] px-3 py-2"
+                          >
+                            <p>{snapshot.fileName}</p>
+                            <p>{snapshot.filePath}</p>
+                            <p>{formatTime(snapshot.updatedAt)}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ) : null}
+                </div>
+              ) : null}
 
               <details className="mt-6 border-t border-[color:var(--border)] pt-4">
                 <summary className="cursor-pointer text-sm font-medium text-[color:var(--foreground)]">

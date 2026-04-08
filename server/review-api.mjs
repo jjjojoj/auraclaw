@@ -7,6 +7,10 @@ import yaml from "js-yaml";
 const ROOT = "/Users/joe/Documents/New project/auraclaw";
 const HARVEST_DIR = path.join(ROOT, "content", "inbox", "source-harvest");
 const REVIEW_DIR = path.join(ROOT, "content", "review");
+const DRAFTS_DIR = path.join(REVIEW_DIR, "drafts");
+const SOURCE_NOTE_DRAFT_DIR = path.join(DRAFTS_DIR, "source-notes");
+const RECIPE_DRAFT_DIR = path.join(DRAFTS_DIR, "recipes");
+const SNAPSHOTS_DIR = path.join(REVIEW_DIR, "snapshots");
 const REVIEW_STATE_FILE = path.join(REVIEW_DIR, "state.json");
 const REVIEW_HISTORY_FILE = path.join(REVIEW_DIR, "history.jsonl");
 
@@ -32,6 +36,7 @@ const VALID_STATUSES = new Set([
   "rejected",
   "archived",
 ]);
+const VALID_BOARDS = new Set(["care", "extension", "dialogue", "opc"]);
 
 app.disable("x-powered-by");
 app.use(express.json({ limit: "1mb" }));
@@ -92,6 +97,9 @@ function requireEnv(name) {
 
 function ensureReviewStorage() {
   fs.mkdirSync(REVIEW_DIR, { recursive: true });
+  fs.mkdirSync(SOURCE_NOTE_DRAFT_DIR, { recursive: true });
+  fs.mkdirSync(RECIPE_DRAFT_DIR, { recursive: true });
+  fs.mkdirSync(SNAPSHOTS_DIR, { recursive: true });
   if (!fs.existsSync(REVIEW_STATE_FILE)) {
     fs.writeFileSync(REVIEW_STATE_FILE, JSON.stringify({ decisions: {} }, null, 2), "utf8");
   }
@@ -148,6 +156,230 @@ function readYamlFile(filePath) {
   }
 }
 
+function slugifyFilePart(value) {
+  const normalized = value
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase();
+  const slug = normalized.replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+  return slug || "draft";
+}
+
+function sanitizeBoardFit(values, fallback) {
+  const input = Array.isArray(values) ? values : fallback ? [fallback] : [];
+  return input.filter((value) => typeof value === "string" && VALID_BOARDS.has(value));
+}
+
+function guessCandidateType(contentType) {
+  return ["source_map", "guide", "tutorial"].includes(contentType)
+    ? "source_note_candidate"
+    : "recipe_candidate";
+}
+
+function mapScoreToConfidence(score) {
+  if (score >= 0.8) return "high";
+  if (score >= 0.55) return "medium";
+  return "low";
+}
+
+function formatBoardName(board) {
+  return {
+    care: "产后护理",
+    extension: "能力扩展",
+    dialogue: "对话训练",
+    opc: "一人公司（OPC）",
+  }[board] || board;
+}
+
+function trimParagraph(value) {
+  return String(value || "").trim();
+}
+
+function createDraftFrontmatter(fields) {
+  return `---\n${yaml.dump(fields, { lineWidth: 120 }).trim()}\n---`;
+}
+
+function buildDraftFileName(candidate, status) {
+  const preferredTitle =
+    status === "approved_recipe"
+      ? candidate.suggestedRecipeTitle || candidate.title
+      : candidate.title;
+  return `${candidate.key}-${slugifyFilePart(preferredTitle)}.md`;
+}
+
+function archiveExistingDraft(filePath, candidateKey, now, nextContent) {
+  if (!fs.existsSync(filePath)) {
+    return "";
+  }
+
+  const currentContent = fs.readFileSync(filePath, "utf8");
+  if (currentContent === nextContent) {
+    return "";
+  }
+
+  const snapshotDir = path.join(SNAPSHOTS_DIR, candidateKey);
+  fs.mkdirSync(snapshotDir, { recursive: true });
+  const stamp = now.replace(/[-:.TZ]/g, "").slice(0, 14);
+  const snapshotPath = path.join(snapshotDir, `${stamp}-${path.basename(filePath)}`);
+  fs.copyFileSync(filePath, snapshotPath);
+  return snapshotPath;
+}
+
+function renderSourceNoteDraft(candidate, reviewer, notes, now) {
+  const boardNames = sanitizeBoardFit(candidate.boardFit, "").map(formatBoardName);
+  const frontmatter = createDraftFrontmatter({
+    draftType: "source_note",
+    candidateKey: candidate.key,
+    candidateId: candidate.candidateId || "",
+    generatedAt: now,
+    reviewer,
+    sourceName: candidate.sourceName,
+    sourceUrl: candidate.sourceUrl,
+    boardFit: candidate.boardFit,
+    contentType: candidate.contentType || "guide",
+    confidence: candidate.confidence || "medium",
+    originLayer: candidate.originLayer,
+  });
+
+  const sections = [
+    frontmatter,
+    `# ${candidate.title || "未命名来源草稿"}`,
+    "",
+    "## 一句话摘要",
+    trimParagraph(candidate.oneLineSummary || candidate.whyItMatters || "待补充这条来源的核心价值。"),
+    "",
+    "## 为什么值得收入 AuraClaw",
+    trimParagraph(candidate.whyItMatters || "待补充这条来源能补足的内容空缺。"),
+    "",
+    "## 建议放入的板块",
+    boardNames.length ? boardNames.map((item) => `- ${item}`).join("\n") : "- 待判断",
+    "",
+    "## 适合反哺的内容方向",
+    trimParagraph(candidate.suggestedAngle || "待补充这条来源更适合反哺到哪个经验包或索引页。"),
+    "",
+    "## 建议站内标题",
+    trimParagraph(candidate.suggestedRecipeTitle || candidate.title || "待定标题"),
+    "",
+    "## 原始来源",
+    `- 站点：${candidate.sourceName || "未知来源"}`,
+    `- 链接：${candidate.sourceUrl || "待补充"}`,
+    `- 采集批次：${candidate.runFileName}`,
+    `- 采集时间：${candidate.runAt || "未知"}`,
+    "",
+    "## 审核备注",
+    trimParagraph(notes || "暂无备注"),
+    "",
+    "## 下一步补充",
+    "- 核对正文是否和已有来源索引重复",
+    "- 补上 3 到 5 条关键要点",
+    "- 判断是否需要进一步改写成经验包",
+    "",
+  ];
+
+  return sections.join("\n");
+}
+
+function renderRecipeDraft(candidate, reviewer, notes, now) {
+  const recipeTitle = trimParagraph(candidate.suggestedRecipeTitle || candidate.title || "未命名经验包草稿");
+  const boardNames = sanitizeBoardFit(candidate.boardFit, "").map(formatBoardName);
+  const frontmatter = createDraftFrontmatter({
+    draftType: "recipe",
+    candidateKey: candidate.key,
+    candidateId: candidate.candidateId || "",
+    generatedAt: now,
+    reviewer,
+    sourceName: candidate.sourceName,
+    sourceUrl: candidate.sourceUrl,
+    boardFit: candidate.boardFit,
+    contentType: candidate.contentType || "workflow",
+    confidence: candidate.confidence || "medium",
+    originLayer: candidate.originLayer,
+  });
+
+  const sections = [
+    frontmatter,
+    `# ${recipeTitle}`,
+    "",
+    "## 经验包定位",
+    trimParagraph(candidate.oneLineSummary || "待补充这个经验包最终能帮用户做成什么。"),
+    "",
+    "## 为什么值得做",
+    trimParagraph(candidate.whyItMatters || "待补充它对 AuraClaw 的价值。"),
+    "",
+    "## 建议包装方向",
+    trimParagraph(candidate.suggestedAngle || "待补充这条内容更适合怎么包装成经验包。"),
+    "",
+    "## 适合板块",
+    boardNames.length ? boardNames.map((item) => `- ${item}`).join("\n") : "- 待判断",
+    "",
+    "## 复制给 OpenClaw 之前要补齐的东西",
+    "- 前置条件：待补",
+    "- 依赖 / skill / 仓库：待补",
+    "- 验证步骤：待补",
+    "- 回退方式：待补",
+    "",
+    "## 可直接沿用的原始线索",
+    `- 来源：${candidate.sourceName || "未知来源"}`,
+    `- 链接：${candidate.sourceUrl || "待补充"}`,
+    `- 采集批次：${candidate.runFileName}`,
+    "",
+    "## 审核备注",
+    trimParagraph(notes || "暂无备注"),
+    "",
+    "## 下一步补充",
+    "- 补真实输入示例",
+    "- 补输出示意",
+    "- 补验证 / 回退 / 风险说明",
+    "",
+  ];
+
+  return sections.join("\n");
+}
+
+function writeDraftFile(candidate, status, notes, reviewer, now, previousDraft) {
+  const baseDir = status === "approved_source_note" ? SOURCE_NOTE_DRAFT_DIR : RECIPE_DRAFT_DIR;
+  const fileName = previousDraft?.type === status && previousDraft?.fileName
+    ? previousDraft.fileName
+    : buildDraftFileName(candidate, status);
+  const filePath = path.join(baseDir, fileName);
+  const content =
+    status === "approved_source_note"
+      ? renderSourceNoteDraft(candidate, reviewer, notes, now)
+      : renderRecipeDraft(candidate, reviewer, notes, now);
+  const snapshotPath = archiveExistingDraft(filePath, candidate.key, now, content);
+  fs.writeFileSync(filePath, content, "utf8");
+
+  return {
+    type: status,
+    filePath,
+    fileName,
+    updatedAt: now,
+    snapshotPath,
+  };
+}
+
+function listDraftSnapshots(candidateKey) {
+  const snapshotDir = path.join(SNAPSHOTS_DIR, candidateKey);
+  if (!fs.existsSync(snapshotDir)) {
+    return [];
+  }
+
+  return fs
+    .readdirSync(snapshotDir)
+    .filter((name) => name.endsWith(".md"))
+    .sort()
+    .reverse()
+    .map((name) => {
+      const filePath = path.join(snapshotDir, name);
+      const stats = fs.statSync(filePath);
+      return {
+        fileName: name,
+        filePath,
+        updatedAt: stats.mtime.toISOString(),
+      };
+    });
+}
+
 function listHarvestRuns() {
   if (!fs.existsSync(HARVEST_DIR)) {
     return [];
@@ -178,7 +410,7 @@ function createCandidateKey(runFileName, candidate) {
   return createHash("sha1").update(basis).digest("hex").slice(0, 16);
 }
 
-function normalizeCandidate(run, candidate, reviewState, reviewHistory) {
+function normalizeCandidate(run, candidate, reviewState, reviewHistory, originLayer = "accepted") {
   const key = createCandidateKey(run.fileName, candidate);
   const currentDecision =
     reviewState.decisions[key] ?? {
@@ -186,7 +418,30 @@ function normalizeCandidate(run, candidate, reviewState, reviewHistory) {
       notes: "",
       reviewer: "",
       reviewedAt: "",
+      draft: null,
     };
+  const contentType = candidate.content_type ?? "";
+  const boardFit = sanitizeBoardFit(candidate.board_fit, candidate.board_fit_guess);
+  const qualityScore = Number(candidate.quality_scores?.total_score ?? 0);
+  const confidence =
+    candidate.confidence ??
+    (originLayer === "prefiltered" ? mapScoreToConfidence(qualityScore) : "medium");
+  const type = candidate.type ?? guessCandidateType(contentType);
+  const oneLineSummary =
+    candidate.one_line_summary ??
+    candidate.summary ??
+    "";
+  const whyItMatters =
+    candidate.why_it_matters ??
+    (originLayer === "prefiltered"
+      ? `来自 ${candidate.source_name || "未知来源"} 的预筛候选，等待人工补充“为什么值得收”。`
+      : "");
+  const suggestedRecipeTitle =
+    candidate.suggested_recipe_title ??
+    (originLayer === "prefiltered" && type === "recipe_candidate" ? candidate.title ?? "" : "");
+  const suggestedAngle =
+    candidate.suggested_angle ??
+    (candidate.novelty_reason ? `预筛提示：${candidate.novelty_reason}` : "");
 
   return {
     key,
@@ -194,22 +449,24 @@ function normalizeCandidate(run, candidate, reviewState, reviewHistory) {
     runFileName: run.fileName,
     runAt: run.data.run_at ?? "",
     collector: run.data.collector ?? "",
+    originLayer,
     title: candidate.title ?? "",
-    type: candidate.type ?? "source_note_candidate",
+    type,
     sourceName: candidate.source_name ?? "",
     sourceUrl: candidate.source_url ?? "",
-    contentType: candidate.content_type ?? "",
-    boardFit: Array.isArray(candidate.board_fit) ? candidate.board_fit : [],
-    whyItMatters: candidate.why_it_matters ?? "",
-    oneLineSummary: candidate.one_line_summary ?? "",
-    suggestedRecipeTitle: candidate.suggested_recipe_title ?? "",
-    suggestedAngle: candidate.suggested_angle ?? "",
-    confidence: candidate.confidence ?? "medium",
-    needsManualReview: Boolean(candidate.needs_manual_review),
+    contentType,
+    boardFit,
+    whyItMatters,
+    oneLineSummary,
+    suggestedRecipeTitle,
+    suggestedAngle,
+    confidence,
+    needsManualReview: originLayer === "prefiltered" ? true : Boolean(candidate.needs_manual_review),
     status: currentDecision.status,
     notes: currentDecision.notes ?? "",
     reviewer: currentDecision.reviewer ?? "",
     reviewedAt: currentDecision.reviewedAt ?? "",
+    draft: currentDecision.draft ?? null,
     history: reviewHistory.filter((entry) => entry.candidateKey === key),
   };
 }
@@ -222,8 +479,16 @@ function getAllCandidates() {
 
   for (const run of runs) {
     const accepted = Array.isArray(run.data.accepted_candidates) ? run.data.accepted_candidates : [];
+    const prefiltered = Array.isArray(run.data.prefiltered_candidates) ? run.data.prefiltered_candidates : [];
+
     for (const candidate of accepted) {
-      candidates.push(normalizeCandidate(run, candidate, reviewState, reviewHistory));
+      candidates.push(normalizeCandidate(run, candidate, reviewState, reviewHistory, "accepted"));
+    }
+
+    if (accepted.length === 0 && prefiltered.length > 0) {
+      for (const candidate of prefiltered) {
+        candidates.push(normalizeCandidate(run, candidate, reviewState, reviewHistory, "prefiltered"));
+      }
     }
   }
 
@@ -566,6 +831,30 @@ app.get("/api/review/candidates/:key/history", (req, res) => {
   res.json({ history: candidate.history });
 });
 
+app.get("/api/review/candidates/:key/draft", (req, res) => {
+  const candidates = getAllCandidates();
+  const candidate = candidates.find((item) => item.key === req.params.key);
+  if (!candidate) {
+    res.status(404).json({ error: "Candidate not found" });
+    return;
+  }
+
+  const draft = candidate.draft;
+  if (!draft?.filePath || !fs.existsSync(draft.filePath)) {
+    res.status(404).json({ error: "Draft not found" });
+    return;
+  }
+
+  const content = fs.readFileSync(draft.filePath, "utf8");
+  res.json({
+    draft: {
+      ...draft,
+      content,
+      snapshots: listDraftSnapshots(candidate.key),
+    },
+  });
+});
+
 app.post("/api/review/candidates/:key/decision", (req, res) => {
   const status = typeof req.body?.status === "string" ? req.body.status : "";
   const notes = typeof req.body?.notes === "string" ? req.body.notes : "";
@@ -586,11 +875,19 @@ app.post("/api/review/candidates/:key/decision", (req, res) => {
 
   const now = new Date().toISOString();
   const state = readReviewState();
+  const previousDecision = state.decisions[req.params.key] ?? null;
+  let draft = previousDecision?.draft ?? null;
+
+  if (status === "approved_source_note" || status === "approved_recipe") {
+    draft = writeDraftFile(candidate, status, notes, reviewer, now, previousDecision?.draft);
+  }
+
   state.decisions[req.params.key] = {
     status,
     notes,
     reviewer,
     reviewedAt: now,
+    draft,
   };
   writeReviewState(state);
 
@@ -604,10 +901,13 @@ app.post("/api/review/candidates/:key/decision", (req, res) => {
     reviewedAt: now,
     runFileName: candidate.runFileName,
     sourceUrl: candidate.sourceUrl,
+    draftFilePath: draft?.filePath ?? "",
+    draftType: draft?.type,
+    draftSnapshotPath: draft?.snapshotPath ?? "",
   });
 
   const refreshed = getAllCandidates().find((item) => item.key === req.params.key);
-  res.json({ candidate: refreshed });
+  res.json({ candidate: refreshed, draft });
 });
 
 app.get("/api/review/summary", (_req, res) => {

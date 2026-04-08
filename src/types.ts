@@ -107,6 +107,17 @@ export interface ReviewHistoryEntry {
   reviewedAt: string;
   runFileName: string;
   sourceUrl: string;
+  draftFilePath?: string;
+  draftType?: "approved_source_note" | "approved_recipe";
+  draftSnapshotPath?: string;
+}
+
+export interface ReviewDraft {
+  type: "approved_source_note" | "approved_recipe";
+  filePath: string;
+  fileName: string;
+  updatedAt: string;
+  snapshotPath?: string;
 }
 
 export interface ReviewCandidate {
@@ -115,6 +126,7 @@ export interface ReviewCandidate {
   runFileName: string;
   runAt: string;
   collector: string;
+  originLayer: "accepted" | "prefiltered";
   title: string;
   type: string;
   sourceName: string;
@@ -131,6 +143,7 @@ export interface ReviewCandidate {
   notes: string;
   reviewer: string;
   reviewedAt: string;
+  draft?: ReviewDraft | null;
   history: ReviewHistoryEntry[];
 }
 
