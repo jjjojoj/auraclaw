@@ -120,6 +120,15 @@ export interface ReviewDraft {
   snapshotPath?: string;
 }
 
+export interface ReviewPublished {
+  type: "approved_source_note" | "approved_recipe";
+  filePath: string;
+  fileName: string;
+  publishedAt: string;
+  publicPath: string;
+  snapshotPath?: string;
+}
+
 export interface ReviewCandidate {
   key: string;
   candidateId: string;
@@ -144,6 +153,7 @@ export interface ReviewCandidate {
   reviewer: string;
   reviewedAt: string;
   draft?: ReviewDraft | null;
+  published?: ReviewPublished | null;
   history: ReviewHistoryEntry[];
 }
 

@@ -11,6 +11,9 @@ const DRAFTS_DIR = path.join(REVIEW_DIR, "drafts");
 const SOURCE_NOTE_DRAFT_DIR = path.join(DRAFTS_DIR, "source-notes");
 const RECIPE_DRAFT_DIR = path.join(DRAFTS_DIR, "recipes");
 const SNAPSHOTS_DIR = path.join(REVIEW_DIR, "snapshots");
+const GENERATED_DIR = path.join(ROOT, "src", "generated");
+const PUBLISHED_SOURCE_NOTES_FILE = path.join(GENERATED_DIR, "published-source-notes.json");
+const PUBLISHED_RECIPES_FILE = path.join(GENERATED_DIR, "published-recipes.json");
 const REVIEW_STATE_FILE = path.join(REVIEW_DIR, "state.json");
 const REVIEW_HISTORY_FILE = path.join(REVIEW_DIR, "history.jsonl");
 
@@ -100,11 +103,18 @@ function ensureReviewStorage() {
   fs.mkdirSync(SOURCE_NOTE_DRAFT_DIR, { recursive: true });
   fs.mkdirSync(RECIPE_DRAFT_DIR, { recursive: true });
   fs.mkdirSync(SNAPSHOTS_DIR, { recursive: true });
+  fs.mkdirSync(GENERATED_DIR, { recursive: true });
   if (!fs.existsSync(REVIEW_STATE_FILE)) {
     fs.writeFileSync(REVIEW_STATE_FILE, JSON.stringify({ decisions: {} }, null, 2), "utf8");
   }
   if (!fs.existsSync(REVIEW_HISTORY_FILE)) {
     fs.writeFileSync(REVIEW_HISTORY_FILE, "", "utf8");
+  }
+  if (!fs.existsSync(PUBLISHED_SOURCE_NOTES_FILE)) {
+    fs.writeFileSync(PUBLISHED_SOURCE_NOTES_FILE, JSON.stringify({ items: [] }, null, 2), "utf8");
+  }
+  if (!fs.existsSync(PUBLISHED_RECIPES_FILE)) {
+    fs.writeFileSync(PUBLISHED_RECIPES_FILE, JSON.stringify({ items: [] }, null, 2), "utf8");
   }
 }
 
@@ -114,6 +124,18 @@ function safeReadJson(filePath, fallback) {
   } catch {
     return fallback;
   }
+}
+
+function readPublishedStore(filePath) {
+  const data = safeReadJson(filePath, { items: [] });
+  if (!data || typeof data !== "object" || !Array.isArray(data.items)) {
+    return { items: [] };
+  }
+  return data;
+}
+
+function writePublishedStore(filePath, data) {
+  fs.writeFileSync(filePath, JSON.stringify(data, null, 2), "utf8");
 }
 
 function readReviewState() {
@@ -380,6 +402,197 @@ function listDraftSnapshots(candidateKey) {
     });
 }
 
+function buildPublicSlug(candidate) {
+  const base = slugifyFilePart(candidate.suggestedRecipeTitle || candidate.title || "");
+  if (!base || base === "draft") {
+    return `recipe-${candidate.key}`;
+  }
+  return `${base}-${candidate.key.slice(0, 6)}`;
+}
+
+function buildPublishedSourceNote(candidate, notes, now) {
+  const boardFit = sanitizeBoardFit(candidate.boardFit, "");
+  const recommendedFor = candidate.suggestedRecipeTitle
+    ? [candidate.suggestedRecipeTitle, ...boardFit.map(formatBoardName)]
+    : boardFit.map(formatBoardName);
+
+  return {
+    id: `PUB-SRC-${candidate.key}`,
+    title: candidate.title || "未命名来源",
+    siteName: candidate.sourceName || "未知来源",
+    sourceUrl: candidate.sourceUrl || "",
+    contentType: candidate.contentType || "guide",
+    boardFit,
+    summary: trimParagraph(candidate.oneLineSummary || candidate.whyItMatters || "后台审核后发布的来源索引。"),
+    keyPoints: [
+      trimParagraph(candidate.whyItMatters || "待补充这条来源的关键价值。"),
+      trimParagraph(candidate.suggestedAngle || "待补充这条来源最适合反哺的改写方向。"),
+      `审核来源：${candidate.runFileName}`,
+    ].filter(Boolean),
+    recommendedFor: recommendedFor.filter(Boolean),
+    newbieFriendly: boardFit.includes("care") || boardFit.includes("dialogue"),
+    needsManualReview: false,
+    citationMode: "structured_rewrite",
+    reuseTargets: ["source_index", "recipe_page"],
+    lastChecked: now.slice(0, 10),
+    notes: trimParagraph(notes || `由后台于 ${now.slice(0, 10)} 发布。`),
+  };
+}
+
+function buildPublishedRecipe(candidate, notes, now) {
+  const boardFit = sanitizeBoardFit(candidate.boardFit, "extension");
+  const trackId = boardFit[0] || "extension";
+  const publicTitle = trimParagraph(candidate.suggestedRecipeTitle || candidate.title || "未命名经验包");
+  const publicSlug = buildPublicSlug(candidate);
+
+  return {
+    id: `PUB-RCP-${candidate.key}`,
+    slug: publicSlug,
+    title: publicTitle,
+    trackId,
+    targetRoles: boardFit.map(formatBoardName),
+    outcome: trimParagraph(candidate.oneLineSummary || `把“${publicTitle}”整理成一条可执行经验包。`),
+    whyItMatters: trimParagraph(candidate.whyItMatters || "这条内容经过后台审核，适合继续打磨成正式经验包。"),
+    prerequisites: [
+      "先阅读这条经验包引用的原始来源",
+      "确认你的 OpenClaw 当前具备执行这类任务的基础能力",
+      "先在小范围里测试一次，再决定是否扩成长期工作流",
+    ],
+    riskLevel: trackId === "care" ? "低" : "中低",
+    minutes: trackId === "opc" ? 18 : 12,
+    testCase: trimParagraph(candidate.suggestedAngle || `先围绕“${publicTitle}”做一次最小可行验证。`),
+    passCriteria: [
+      "能说清这条经验包最终想帮用户做成什么",
+      "能跑出一次可验证的最小结果",
+      "能说明下一步还需要补哪些能力或素材",
+    ],
+    promise: trimParagraph(candidate.oneLineSummary || `这是一条由后台审核发布的基础版经验包：${publicTitle}`),
+    copyBlock: `你现在要围绕“${publicTitle}”执行一条基础版 AuraClaw 经验包。\n\n目标\n- 先理解我要完成的事情\n- 再判断当前环境是否已经具备这条经验需要的能力\n- 最后给出一次最小可行结果和后续补齐建议\n\n背景线索\n- 来源：${candidate.sourceName || "未知来源"}\n- 原始链接：${candidate.sourceUrl || "待补充"}\n- 审核建议：${candidate.suggestedAngle || candidate.whyItMatters || "先根据来源内容整理执行步骤"}\n\n执行要求\n1. 先不要假装已经有所有能力；如果需要 skill、仓库或额外配置，请明确说出来。\n2. 先跑一版最小结果，不要一开始就扩成复杂自动化。\n3. 输出时告诉我：这次做成了什么、还缺什么、下一步最值得继续补什么。\n\n边界\n- 不要编造来源里没有的信息\n- 不要跳过验证\n- 不要直接把复杂自动化当成已经完成`,
+    starterLabel: "后台发布",
+    salesPitch: "这是一条通过审核后先上线的基础版经验包，方便继续在真实场景里补厚。",
+    bestFor: [
+      `想快速试跑“${publicTitle}”的人`,
+      "希望先拿到基础版执行包，再慢慢补厚的人",
+    ],
+    prepareChecklist: [
+      "先打开原始来源，确认这条经验与你当前目标一致",
+      "准备一个最小测试案例，不要一开始就上真实生产数据",
+      "如果需要 skill 或仓库，先让 OpenClaw 明确列出来",
+    ],
+    youWillGet: [
+      "一版基础执行包",
+      "一次最小可行结果",
+      "后续补能力或补内容的建议",
+    ],
+    experienceIncludes: [
+      "目标判断",
+      "能力缺口判断",
+      "最小执行结果",
+      "后续补齐建议",
+    ],
+    executionFlow: [
+      "先读原始来源和审核建议，判断这条经验真正要完成的事。",
+      "再判断当前 OpenClaw 是否已经具备需要的能力；如果没有，先列能力缺口。",
+      "先跑一版最小结果，再说明下一步怎么补成更完整的经验包。",
+    ],
+    dependencies: [
+      {
+        name: candidate.sourceName || "原始来源",
+        kind: "审核来源",
+        source: candidate.sourceUrl || "",
+        summary: trimParagraph(candidate.whyItMatters || candidate.oneLineSummary || "后台审核通过的来源。"),
+      },
+    ],
+    sampleInput: {
+      title: "建议你先用一个最小案例测试",
+      content: `请先围绕“${publicTitle}”跑一个最小案例。\n如果你发现缺少 skill、仓库或平台接入，请先告诉我缺什么，再继续。`,
+    },
+    outputPreview: `本次最小结果\n- 已完成：${candidate.oneLineSummary || "待补充"}\n- 还缺：待补充具体能力或素材\n- 下一步：继续补厚这条经验包`,
+    pitfalls: [
+      {
+        issue: "一开始就把基础版经验包当成完整自动化",
+        fix: "先跑通最小结果，再决定要不要接长期调度或多步骤工作流。",
+      },
+      {
+        issue: "来源线索还不够，却直接要求 OpenClaw 一步到位",
+        fix: "先让 OpenClaw 说明还缺哪些能力、素材或配置，再继续扩展。",
+      },
+    ],
+    shortestCommand: `先围绕“${publicTitle}”做一个最小可行结果。`,
+    validationSteps: [
+      "确认 OpenClaw 没有跳过能力判断",
+      "确认先交付了一次最小结果",
+      "确认最后给出了下一步补齐建议",
+    ],
+    fallbackPlan: [
+      "如果一次结果太散，先缩到一个更小的测试案例",
+      "如果能力不够，先补 skill / 仓库 / 平台接入，再重新执行",
+    ],
+    sourceTips: [
+      `来源：${candidate.sourceName || "未知来源"}`,
+      `原始链接：${candidate.sourceUrl || "待补充"}`,
+      trimParagraph(notes || "这条经验包来自后台审核发布。"),
+    ],
+    nextStep: trackId === "opc" ? "继续补成一条可长期运行的工作骨架。" : "继续补真实输入示例、验证步骤和回退方案。",
+  };
+}
+
+function publishCandidate(candidate, status, notes, now, previousPublished) {
+  if (status === "approved_source_note") {
+    const store = readPublishedStore(PUBLISHED_SOURCE_NOTES_FILE);
+    const note = buildPublishedSourceNote(candidate, notes, now);
+    const item = {
+      candidateKey: candidate.key,
+      publishedAt: now,
+      publicPath: "/sources",
+      note,
+    };
+    store.items = store.items.filter((entry) => entry.candidateKey !== candidate.key);
+    store.items.unshift(item);
+    writePublishedStore(PUBLISHED_SOURCE_NOTES_FILE, store);
+    return {
+      type: status,
+      filePath: PUBLISHED_SOURCE_NOTES_FILE,
+      fileName: path.basename(PUBLISHED_SOURCE_NOTES_FILE),
+      publishedAt: now,
+      publicPath: "/sources",
+      snapshotPath: previousPublished?.filePath ?? "",
+    };
+  }
+
+  const store = readPublishedStore(PUBLISHED_RECIPES_FILE);
+  const recipe = buildPublishedRecipe(candidate, notes, now);
+  const item = {
+    candidateKey: candidate.key,
+    publishedAt: now,
+    publicPath: `/recipes/${recipe.slug}`,
+    recipe,
+  };
+  store.items = store.items.filter((entry) => entry.candidateKey !== candidate.key);
+  store.items.unshift(item);
+  writePublishedStore(PUBLISHED_RECIPES_FILE, store);
+  return {
+    type: status,
+    filePath: PUBLISHED_RECIPES_FILE,
+    fileName: path.basename(PUBLISHED_RECIPES_FILE),
+    publishedAt: now,
+    publicPath: `/recipes/${recipe.slug}`,
+    snapshotPath: previousPublished?.filePath ?? "",
+  };
+}
+
+function unpublishCandidate(candidate, published) {
+  if (!published) {
+    return;
+  }
+
+  const targetFile =
+    published.type === "approved_source_note" ? PUBLISHED_SOURCE_NOTES_FILE : PUBLISHED_RECIPES_FILE;
+  const store = readPublishedStore(targetFile);
+  store.items = store.items.filter((entry) => entry.candidateKey !== candidate.key);
+  writePublishedStore(targetFile, store);
+}
+
 function listHarvestRuns() {
   if (!fs.existsSync(HARVEST_DIR)) {
     return [];
@@ -419,6 +632,7 @@ function normalizeCandidate(run, candidate, reviewState, reviewHistory, originLa
       reviewer: "",
       reviewedAt: "",
       draft: null,
+      published: null,
     };
   const contentType = candidate.content_type ?? "";
   const boardFit = sanitizeBoardFit(candidate.board_fit, candidate.board_fit_guess);
@@ -467,6 +681,7 @@ function normalizeCandidate(run, candidate, reviewState, reviewHistory, originLa
     reviewer: currentDecision.reviewer ?? "",
     reviewedAt: currentDecision.reviewedAt ?? "",
     draft: currentDecision.draft ?? null,
+    published: currentDecision.published ?? null,
     history: reviewHistory.filter((entry) => entry.candidateKey === key),
   };
 }
@@ -855,6 +1070,119 @@ app.get("/api/review/candidates/:key/draft", (req, res) => {
   });
 });
 
+app.post("/api/review/candidates/:key/publish", (req, res) => {
+  const candidates = getAllCandidates();
+  const candidate = candidates.find((item) => item.key === req.params.key);
+  if (!candidate) {
+    res.status(404).json({ error: "Candidate not found" });
+    return;
+  }
+
+  if (candidate.status !== "approved_source_note" && candidate.status !== "approved_recipe") {
+    res.status(400).json({ error: "Only approved drafts can be published" });
+    return;
+  }
+
+  if (!candidate.draft?.filePath || !fs.existsSync(candidate.draft.filePath)) {
+    res.status(400).json({ error: "Draft not found. Please approve again to regenerate the draft." });
+    return;
+  }
+
+  const now = new Date().toISOString();
+  const reviewer = req.adminSession?.username || ADMIN_USERNAME;
+  const state = readReviewState();
+  const previousDecision = state.decisions[req.params.key] ?? null;
+  const published = publishCandidate(
+    candidate,
+    candidate.status,
+    candidate.notes,
+    now,
+    previousDecision?.published,
+  );
+
+  state.decisions[req.params.key] = {
+    ...(previousDecision ?? {}),
+    status: candidate.status,
+    notes: candidate.notes,
+    reviewer,
+    reviewedAt: previousDecision?.reviewedAt ?? now,
+    draft: candidate.draft,
+    published,
+  };
+  writeReviewState(state);
+
+  appendReviewHistory({
+    candidateKey: req.params.key,
+    candidateId: candidate.candidateId,
+    title: candidate.title,
+    status: candidate.status,
+    notes: `发布到前台：${published.publicPath}`,
+    reviewer,
+    reviewedAt: now,
+    runFileName: candidate.runFileName,
+    sourceUrl: candidate.sourceUrl,
+    draftFilePath: candidate.draft?.filePath ?? "",
+    draftType: candidate.draft?.type,
+    publishedFilePath: published.filePath,
+    publicPath: published.publicPath,
+  });
+
+  const refreshed = getAllCandidates().find((item) => item.key === req.params.key);
+  res.json({ candidate: refreshed, published });
+});
+
+app.post("/api/review/candidates/:key/unpublish", (req, res) => {
+  const candidates = getAllCandidates();
+  const candidate = candidates.find((item) => item.key === req.params.key);
+  if (!candidate) {
+    res.status(404).json({ error: "Candidate not found" });
+    return;
+  }
+
+  if (!candidate.published) {
+    res.status(400).json({ error: "Candidate is not published" });
+    return;
+  }
+
+  const now = new Date().toISOString();
+  const reviewer = req.adminSession?.username || ADMIN_USERNAME;
+  const state = readReviewState();
+  const previousDecision = state.decisions[req.params.key] ?? null;
+  const previousPublished = previousDecision?.published ?? candidate.published;
+
+  unpublishCandidate(candidate, previousPublished);
+
+  state.decisions[req.params.key] = {
+    ...(previousDecision ?? {}),
+    status: candidate.status,
+    notes: candidate.notes,
+    reviewer: previousDecision?.reviewer ?? reviewer,
+    reviewedAt: previousDecision?.reviewedAt ?? now,
+    draft: previousDecision?.draft ?? candidate.draft ?? null,
+    published: null,
+  };
+  writeReviewState(state);
+
+  appendReviewHistory({
+    candidateKey: req.params.key,
+    candidateId: candidate.candidateId,
+    title: candidate.title,
+    status: candidate.status,
+    notes: `已撤回发布：${previousPublished.publicPath}`,
+    reviewer,
+    reviewedAt: now,
+    runFileName: candidate.runFileName,
+    sourceUrl: candidate.sourceUrl,
+    draftFilePath: candidate.draft?.filePath ?? "",
+    draftType: candidate.draft?.type,
+    publishedFilePath: previousPublished.filePath,
+    publicPath: previousPublished.publicPath,
+  });
+
+  const refreshed = getAllCandidates().find((item) => item.key === req.params.key);
+  res.json({ candidate: refreshed });
+});
+
 app.post("/api/review/candidates/:key/decision", (req, res) => {
   const status = typeof req.body?.status === "string" ? req.body.status : "";
   const notes = typeof req.body?.notes === "string" ? req.body.notes : "";
@@ -877,9 +1205,13 @@ app.post("/api/review/candidates/:key/decision", (req, res) => {
   const state = readReviewState();
   const previousDecision = state.decisions[req.params.key] ?? null;
   let draft = previousDecision?.draft ?? null;
+  let published = previousDecision?.published ?? null;
 
   if (status === "approved_source_note" || status === "approved_recipe") {
     draft = writeDraftFile(candidate, status, notes, reviewer, now, previousDecision?.draft);
+  } else if ((status === "rejected" || status === "archived") && previousDecision?.published) {
+    unpublishCandidate(candidate, previousDecision.published);
+    published = null;
   }
 
   state.decisions[req.params.key] = {
@@ -888,6 +1220,7 @@ app.post("/api/review/candidates/:key/decision", (req, res) => {
     reviewer,
     reviewedAt: now,
     draft,
+    published,
   };
   writeReviewState(state);
 
@@ -904,6 +1237,8 @@ app.post("/api/review/candidates/:key/decision", (req, res) => {
     draftFilePath: draft?.filePath ?? "",
     draftType: draft?.type,
     draftSnapshotPath: draft?.snapshotPath ?? "",
+    publishedFilePath: published?.filePath ?? "",
+    publicPath: published?.publicPath ?? "",
   });
 
   const refreshed = getAllCandidates().find((item) => item.key === req.params.key);

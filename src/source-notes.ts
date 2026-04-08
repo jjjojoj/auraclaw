@@ -1,6 +1,7 @@
 import type { SourceNote } from "./types";
+import publishedSourceNotesStore from "./generated/published-source-notes.json";
 
-export const sourceNotes: SourceNote[] = [
+const baseSourceNotes: SourceNote[] = [
   {
     id: "OC101-001",
     title: "OpenClaw 101 仓库结构与来源分类法",
@@ -332,5 +333,11 @@ export const sourceNotes: SourceNote[] = [
     notes: "适合拿来做路径判断，不适合直接替代 AuraClaw 自己的经验包。",
   },
 ];
+
+const publishedSourceNotes = ((publishedSourceNotesStore as { items?: Array<{ note?: SourceNote }> }).items ?? [])
+  .map((item) => item.note)
+  .filter((item): item is SourceNote => Boolean(item));
+
+export const sourceNotes: SourceNote[] = [...publishedSourceNotes, ...baseSourceNotes];
 
 export const featuredSourceNoteIds = ["OC101-002", "OC101-003", "AOT-001", "AOT-003"];

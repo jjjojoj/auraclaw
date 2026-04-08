@@ -77,6 +77,7 @@ export function ReviewPage() {
   const [draftPreviews, setDraftPreviews] = useState<Record<string, DraftPreview | null>>({});
   const [draftLoadingKey, setDraftLoadingKey] = useState("");
   const [savingKey, setSavingKey] = useState<string>("");
+  const [publishingKey, setPublishingKey] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -171,6 +172,48 @@ export function ReviewPage() {
       setError(err instanceof Error ? err.message : "读取草稿失败");
     } finally {
       setDraftLoadingKey("");
+    }
+  }
+
+  async function publishCandidate(candidate: ReviewCandidate) {
+    setPublishingKey(candidate.key);
+    setError("");
+
+    try {
+      const response = await fetch(`/api/review/candidates/${candidate.key}/publish`, {
+        method: "POST",
+      });
+      if (response.status === 401) {
+        navigate("/admin/login", { replace: true });
+        return;
+      }
+      if (!response.ok) throw new Error("发布到前台失败");
+      await loadCandidates();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "发布失败");
+    } finally {
+      setPublishingKey("");
+    }
+  }
+
+  async function unpublishCandidate(candidate: ReviewCandidate) {
+    setPublishingKey(candidate.key);
+    setError("");
+
+    try {
+      const response = await fetch(`/api/review/candidates/${candidate.key}/unpublish`, {
+        method: "POST",
+      });
+      if (response.status === 401) {
+        navigate("/admin/login", { replace: true });
+        return;
+      }
+      if (!response.ok) throw new Error("撤回发布失败");
+      await loadCandidates();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "撤回失败");
+    } finally {
+      setPublishingKey("");
     }
   }
 
@@ -377,6 +420,22 @@ export function ReviewPage() {
                       </div>
                     </div>
                   ) : null}
+
+                  {candidate.published ? (
+                    <div className="border-t border-[color:var(--border)] pt-4">
+                      <p className="eyebrow mb-2">已发布到前台</p>
+                      <div className="space-y-2 text-sm leading-7 text-[color:var(--foreground)]">
+                        <p>{candidate.published.fileName}</p>
+                        <p className="text-[color:var(--muted-foreground)]">{candidate.published.filePath}</p>
+                        <p className="text-[color:var(--muted-foreground)]">
+                          发布时间：{formatTime(candidate.published.publishedAt)}
+                        </p>
+                        <p className="text-[color:var(--muted-foreground)]">
+                          公开路径：{candidate.published.publicPath}
+                        </p>
+                      </div>
+                    </div>
+                  ) : null}
                 </div>
 
                 <div className="space-y-4 border border-[color:var(--border)] bg-[color:var(--panel-muted)] p-4">
@@ -433,6 +492,47 @@ export function ReviewPage() {
                       归档
                     </Button>
                   </div>
+
+                  {candidate.draft ? (
+                    <div className="grid gap-3 sm:grid-cols-2">
+                      {candidate.published ? (
+                        <>
+                          <Button
+                            type="button"
+                            disabled={publishingKey === candidate.key}
+                            onClick={() => void publishCandidate(candidate)}
+                            className="justify-start rounded-full"
+                          >
+                            <CheckCheck className="h-4 w-4" />
+                            重新发布到前台
+                          </Button>
+                          <Button
+                            type="button"
+                            disabled={publishingKey === candidate.key}
+                            onClick={() => void unpublishCandidate(candidate)}
+                            variant="outline"
+                            className="justify-start rounded-full"
+                          >
+                            <RotateCcw className="h-4 w-4" />
+                            撤回发布
+                          </Button>
+                        </>
+                      ) : (
+                        <Button
+                          type="button"
+                          disabled={
+                            publishingKey === candidate.key ||
+                            (candidate.status !== "approved_source_note" && candidate.status !== "approved_recipe")
+                          }
+                          onClick={() => void publishCandidate(candidate)}
+                          className="justify-start rounded-full sm:col-span-2"
+                        >
+                          <CheckCheck className="h-4 w-4" />
+                          发布到前台
+                        </Button>
+                      )}
+                    </div>
+                  ) : null}
 
                   <div className="border-t border-[color:var(--border)] pt-4 text-sm leading-7 text-[color:var(--muted-foreground)]">
                     <p>当前状态：{statusLabel[candidate.status]}</p>

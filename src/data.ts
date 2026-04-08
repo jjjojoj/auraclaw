@@ -1,4 +1,5 @@
 import type { Recipe, StarterPackQuestion, Track } from "./types";
+import publishedRecipesStore from "./generated/published-recipes.json";
 
 export const tracks: Track[] = [
   {
@@ -63,7 +64,7 @@ export const tracks: Track[] = [
   },
 ];
 
-export const recipes: Recipe[] = [
+const baseRecipes: Recipe[] = [
   {
     id: "C0",
     slug: "first-30-minutes-starter-pack",
@@ -2759,6 +2760,12 @@ https://github.com/VoltAgent/awesome-openclaw-skills
     nextStep: "AI 日报跑顺后，最适合继续接“定时任务表达校准”或“行业情报周报的中文来源采集包”。",
   },
 ];
+
+const publishedRecipes = ((publishedRecipesStore as { items?: Array<{ recipe?: Recipe }> }).items ?? [])
+  .map((item) => item.recipe)
+  .filter((item): item is Recipe => Boolean(item));
+
+export const recipes: Recipe[] = [...publishedRecipes, ...baseRecipes];
 
 export const highlightedRecipeIds = ["C0", "C4", "C5", "C6", "C7", "E1", "E2", "E3", "E4", "D1", "O1", "O2", "O3", "O4", "O5", "O6"];
 
