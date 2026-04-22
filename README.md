@@ -15,8 +15,6 @@
 
 </div>
 
-![AuraClaw Cover](docs/assets/github-cover.svg)
-
 > AuraClaw 不是教程堆积站，也不是 Prompt 市场。  
 > 它更像一个公开展示的 Agent 经验主站：前台承载经验包与 7 天学习路径，内容供给由 OpenClaw 持续驱动，人类只做最终审核。
 
