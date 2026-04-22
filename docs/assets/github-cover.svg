@@ -135,10 +135,10 @@
       <g transform="translate(26 300)">
         <rect width="352" height="72" rx="22" fill="#EDEFF7"/>
         <text x="22" y="25" fill="#64748B" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="700" letter-spacing="1.8">
-          REVIEW BACKEND
+          INTERNAL REVIEW
         </text>
         <text x="22" y="55" fill="#0F172A" font-family="Arial, Helvetica, sans-serif" font-size="28" font-weight="800">
-          admin.auraclaw.cc
+          private review system
         </text>
         <circle cx="323" cy="36" r="11" fill="#F97316"/>
       </g>
