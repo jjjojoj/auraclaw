@@ -11,7 +11,7 @@
 ![Workflow](https://img.shields.io/badge/Publishing-human--in--the--loop-b45309)
 ![Status](https://img.shields.io/badge/Status-live-166534)
 
-[体验链接](https://auraclaw.cc) · [部署说明](docs/AuraClaw_阿里云部署说明.md) · [侦察兵运维说明](docs/AuraClaw_侦察兵_v5.3运维说明.md)
+[体验链接](https://auraclaw.cc) · [主控文档](docs/AuraClaw_主控文档.md) · [版本索引与项目地图](docs/AuraClaw_版本索引与项目地图.md)
 
 </div>
 
@@ -147,10 +147,10 @@ npm run bundle:deploy
 
 ## 文档入口
 
-- [AuraClaw 阿里云部署说明](docs/AuraClaw_阿里云部署说明.md)
-- [AuraClaw 侦察兵 v5.3 运维说明](docs/AuraClaw_侦察兵_v5.3运维说明.md)
-- [OpenClaw 部署与运维交接提示词](docs/OpenClaw_部署与运维交接提示词.md)
-- [OpenClaw 阿里云部署提示词](docs/OpenClaw_阿里云部署提示词.md)
+- [AuraClaw 主控文档](docs/AuraClaw_主控文档.md)
+- [AuraClaw 版本索引与项目地图](docs/AuraClaw_版本索引与项目地图.md)
+
+内部部署、侦察兵运维和交接提示词目前不作为公开仓库入口展示。
 
 ## 当前定位
 
