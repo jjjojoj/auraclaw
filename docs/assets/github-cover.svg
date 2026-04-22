@@ -1,74 +1,159 @@
 <svg width="1280" height="640" viewBox="0 0 1280 640" fill="none" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <linearGradient id="bg" x1="80" y1="40" x2="1180" y2="600" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#FFF7ED"/>
-      <stop offset="0.55" stop-color="#F8FAFC"/>
-      <stop offset="1" stop-color="#EFF6FF"/>
+    <linearGradient id="page-bg" x1="84" y1="36" x2="1188" y2="612" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFF8EE"/>
+      <stop offset="0.5" stop-color="#F7F8FC"/>
+      <stop offset="1" stop-color="#EEF4FF"/>
     </linearGradient>
-    <linearGradient id="accent" x1="220" y1="180" x2="1040" y2="500" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#FB923C"/>
-      <stop offset="1" stop-color="#0F172A"/>
+    <linearGradient id="hero-glow" x1="770" y1="104" x2="1102" y2="518" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#243252"/>
+      <stop offset="1" stop-color="#0D1324"/>
     </linearGradient>
+    <linearGradient id="line-glow" x1="876" y1="222" x2="1106" y2="420" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFB35C"/>
+      <stop offset="1" stop-color="#F97316"/>
+    </linearGradient>
+    <filter id="shadow-lg" x="22" y="14" width="1236" height="612" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="24" stdDeviation="28" flood-color="#0F172A" flood-opacity="0.10"/>
+    </filter>
+    <filter id="shadow-md" x="720" y="58" width="476" height="524" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="20" stdDeviation="28" flood-color="#0F172A" flood-opacity="0.18"/>
+    </filter>
+    <filter id="shadow-sm" x="78" y="370" width="566" height="166" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="12" stdDeviation="18" flood-color="#0F172A" flood-opacity="0.08"/>
+    </filter>
+    <pattern id="grid" width="28" height="28" patternUnits="userSpaceOnUse">
+      <path d="M28 0H0V28" stroke="#243252" stroke-opacity="0.1" stroke-width="1"/>
+    </pattern>
   </defs>
 
-  <rect x="0" y="0" width="1280" height="640" rx="32" fill="url(#bg)"/>
-  <rect x="44" y="44" width="1192" height="552" rx="28" fill="#FFFDF8" stroke="#E2E8F0" stroke-width="2"/>
+  <rect width="1280" height="640" rx="36" fill="#E9EEF8"/>
 
-  <rect x="88" y="88" width="208" height="36" rx="18" fill="#0F172A"/>
-  <text x="192" y="111" text-anchor="middle" fill="#FFF7ED" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="700" letter-spacing="2.4">
-    OPENCLAW EXPERIENCE SYSTEM
+  <g filter="url(#shadow-lg)">
+    <rect x="44" y="36" width="1192" height="568" rx="34" fill="url(#page-bg)"/>
+    <rect x="44.75" y="36.75" width="1190.5" height="566.5" rx="33.25" stroke="#DDE5F3" stroke-width="1.5"/>
+  </g>
+
+  <circle cx="1124" cy="118" r="110" fill="#FFFFFF" fill-opacity="0.7"/>
+  <circle cx="1092" cy="522" r="152" fill="#EEF2FF"/>
+  <circle cx="150" cy="112" r="82" fill="#FFFFFF" fill-opacity="0.55"/>
+
+  <rect x="92" y="88" width="342" height="38" rx="19" fill="#101828"/>
+  <text x="263" y="112" text-anchor="middle" fill="#FFF8EE" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="700" letter-spacing="2.1">
+    MULTI-AGENT EXPERIENCE PLATFORM
   </text>
 
-  <text x="88" y="208" fill="#0F172A" font-family="Arial, Helvetica, sans-serif" font-size="78" font-weight="800">
+  <text x="92" y="208" fill="#0F172A" font-family="Arial, Helvetica, sans-serif" font-size="92" font-weight="800" letter-spacing="-3.5">
     AURACLAW
   </text>
-  <text x="88" y="268" fill="#475569" font-family="Arial, Helvetica, sans-serif" font-size="30" font-weight="500">
-    Public site, review backend, and a local OpenClaw scout
+
+  <text x="92" y="278" fill="#334155" font-family="Arial, Helvetica, sans-serif" font-size="31" font-weight="500">
+    Experience packs, a 7-day learning path, and a
   </text>
-  <text x="88" y="316" fill="#475569" font-family="Arial, Helvetica, sans-serif" font-size="30" font-weight="500">
-    working together as one content workflow.
+  <text x="92" y="322" fill="#334155" font-family="Arial, Helvetica, sans-serif" font-size="31" font-weight="500">
+    human-reviewed publishing loop for modern AI agents.
   </text>
 
-  <g transform="translate(88 392)">
-    <rect width="302" height="132" rx="22" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="2"/>
-    <text x="28" y="38" fill="#94A3B8" font-family="Arial, Helvetica, sans-serif" font-size="14" font-weight="700" letter-spacing="1.8">
-      PUBLIC SITE
-    </text>
-    <text x="28" y="78" fill="#0F172A" font-family="Arial, Helvetica, sans-serif" font-size="34" font-weight="800">
-      auraclaw.cc
-    </text>
-    <text x="28" y="110" fill="#475569" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="500">
-      Experience packs and learning paths
+  <g transform="translate(92 360)">
+    <rect width="310" height="46" rx="23" fill="#FFFDF8" stroke="#E7EAF0" stroke-width="1.5"/>
+    <circle cx="28" cy="23" r="7" fill="#F97316"/>
+    <text x="48" y="29" fill="#0F172A" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="700">
+      OpenClaw · Hermes Agent · compatible agents
     </text>
   </g>
 
-  <g transform="translate(418 392)">
-    <rect width="302" height="132" rx="22" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="2"/>
-    <text x="28" y="38" fill="#94A3B8" font-family="Arial, Helvetica, sans-serif" font-size="14" font-weight="700" letter-spacing="1.8">
-      REVIEW BACKEND
-    </text>
-    <text x="28" y="78" fill="#0F172A" font-family="Arial, Helvetica, sans-serif" font-size="34" font-weight="800">
-      admin.auraclaw.cc
-    </text>
-    <text x="28" y="110" fill="#475569" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="500">
-      Approve, rank, publish, and archive
-    </text>
+  <g filter="url(#shadow-sm)">
+    <g transform="translate(92 408)">
+      <rect width="520" height="110" rx="28" fill="#FFFFFF" fill-opacity="0.88"/>
+      <rect x="0.75" y="0.75" width="518.5" height="108.5" rx="27.25" stroke="#E2E8F0" stroke-width="1.5"/>
+
+      <g transform="translate(24 22)">
+        <text x="0" y="16" fill="#94A3B8" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="700" letter-spacing="1.8">
+          CORE SURFACES
+        </text>
+
+        <g transform="translate(0 30)">
+          <rect width="146" height="40" rx="20" fill="#FFF7ED"/>
+          <text x="18" y="25" fill="#9A3412" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="700">
+            Experience Packs
+          </text>
+        </g>
+
+        <g transform="translate(158 30)">
+          <rect width="166" height="40" rx="20" fill="#EEF2FF"/>
+          <text x="18" y="25" fill="#3730A3" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="700">
+            7-Day Learning Path
+          </text>
+        </g>
+
+        <g transform="translate(336 30)">
+          <rect width="160" height="40" rx="20" fill="#F8FAFC"/>
+          <text x="18" y="25" fill="#0F172A" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="700">
+            Human Review Loop
+          </text>
+        </g>
+      </g>
+    </g>
   </g>
 
-  <g transform="translate(748 392)">
-    <rect width="402" height="132" rx="22" fill="#0F172A"/>
-    <text x="28" y="38" fill="#FDBA74" font-family="Arial, Helvetica, sans-serif" font-size="14" font-weight="700" letter-spacing="1.8">
-      LOCAL OPENCLAW SCOUT
-    </text>
-    <text x="28" y="78" fill="#FFFFFF" font-family="Arial, Helvetica, sans-serif" font-size="34" font-weight="800">
-      scout -> review -> publish
-    </text>
-    <text x="28" y="110" fill="#CBD5E1" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="500">
-      Human approval stays in the loop
-    </text>
+  <g filter="url(#shadow-md)">
+    <g transform="translate(748 82)">
+      <rect width="404" height="476" rx="34" fill="url(#hero-glow)"/>
+      <rect x="1" y="1" width="402" height="474" rx="33" stroke="#243252" stroke-width="2"/>
+      <rect x="0" y="0" width="404" height="476" rx="34" fill="url(#grid)" fill-opacity="0.22"/>
+
+      <circle cx="318" cy="98" r="86" stroke="#FFFFFF" stroke-opacity="0.09" stroke-width="1.5"/>
+      <circle cx="318" cy="98" r="126" stroke="#FFFFFF" stroke-opacity="0.06" stroke-width="1.5"/>
+      <path d="M162 122C218 78 279 71 331 96C370 114 392 149 393 196" stroke="url(#line-glow)" stroke-width="12" stroke-linecap="round"/>
+      <circle cx="162" cy="122" r="12" fill="#FDBA74"/>
+      <circle cx="392" cy="196" r="12" fill="#F97316"/>
+
+      <text x="32" y="48" fill="#F8FAFC" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="700" letter-spacing="2.2">
+        PUBLISHING LOOP
+      </text>
+      <text x="32" y="86" fill="#FFFFFF" font-family="Arial, Helvetica, sans-serif" font-size="34" font-weight="800" letter-spacing="-0.6">
+        scout → review → publish
+      </text>
+      <text x="32" y="118" fill="#CBD5E1" font-family="Arial, Helvetica, sans-serif" font-size="19" font-weight="500">
+        Local discovery stays fast.
+      </text>
+      <text x="32" y="146" fill="#CBD5E1" font-family="Arial, Helvetica, sans-serif" font-size="19" font-weight="500">
+        Human approval stays in control.
+      </text>
+
+      <g transform="translate(26 210)">
+        <rect width="352" height="72" rx="22" fill="#F8FAFC"/>
+        <text x="22" y="25" fill="#94A3B8" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="700" letter-spacing="1.8">
+          PUBLIC SITE
+        </text>
+        <text x="22" y="55" fill="#0F172A" font-family="Arial, Helvetica, sans-serif" font-size="28" font-weight="800">
+          auraclaw.cc
+        </text>
+        <circle cx="323" cy="36" r="11" fill="#22C55E"/>
+      </g>
+
+      <g transform="translate(26 300)">
+        <rect width="352" height="72" rx="22" fill="#EDEFF7"/>
+        <text x="22" y="25" fill="#64748B" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="700" letter-spacing="1.8">
+          REVIEW BACKEND
+        </text>
+        <text x="22" y="55" fill="#0F172A" font-family="Arial, Helvetica, sans-serif" font-size="28" font-weight="800">
+          admin.auraclaw.cc
+        </text>
+        <circle cx="323" cy="36" r="11" fill="#F97316"/>
+      </g>
+
+      <g transform="translate(26 390)">
+        <rect width="352" height="54" rx="18" fill="#131C31"/>
+        <text x="20" y="34" fill="#F8FAFC" font-family="Arial, Helvetica, sans-serif" font-size="19" font-weight="700">
+          ranked, approved, published, and traceable
+        </text>
+      </g>
+    </g>
   </g>
 
-  <path d="M876 190C963 142 1058 175 1115 251C1153 301 1168 368 1147 432" stroke="url(#accent)" stroke-width="18" stroke-linecap="round"/>
-  <circle cx="870" cy="192" r="18" fill="#FB923C"/>
-  <circle cx="1140" cy="436" r="18" fill="#0F172A"/>
+  <g opacity="0.9">
+    <path d="M626 150H688" stroke="#F97316" stroke-width="2.2" stroke-linecap="round"/>
+    <path d="M644 132V168" stroke="#F97316" stroke-width="2.2" stroke-linecap="round"/>
+  </g>
 </svg>
