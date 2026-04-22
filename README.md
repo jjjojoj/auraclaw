@@ -1,106 +1,169 @@
+<div align="center">
+
 # AuraClaw
 
-AuraClaw 是一个围绕 OpenClaw 的经验进化平台。
+一个面向中文用户的 OpenClaw 经验平台。  
+把分散在聊天记录、教程帖子、实战踩坑里的正确做法，整理成可以直接交给 OpenClaw 执行的经验包。
 
-它不卖零散 Prompt，不做教程百科，也不只是 skill 导航。AuraClaw 想交付的是一整段已经跑通过的正确经验，让刚接触 OpenClaw 的人也能更快养成一只真正会做事的 OpenClaw。
+![React](https://img.shields.io/badge/React-19-111827)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.8-1d4ed8)
+![OpenClaw](https://img.shields.io/badge/OpenClaw-human--reviewed-0f172a)
+![Workflow](https://img.shields.io/badge/Publishing-human--in--the--loop-b45309)
+![Status](https://img.shields.io/badge/Status-live-166534)
 
-## 现在的方向
+[体验链接](https://auraclaw.cc) · [部署说明](docs/AuraClaw_阿里云部署说明.md) · [侦察兵运维说明](docs/AuraClaw_侦察兵_v5.3运维说明.md)
 
-AuraClaw 当前的核心判断是：
+</div>
 
-- 用户真正需要的不是一句话，而是一整包可复制经验
-- `skill` 只是经验包中的一个步骤，不应该让新手先去理解
-- 我们要整理的是“正确做事经验”的集体进化，而不是错误尝试的堆积
-- 网站主要服务人类用户，同时也会准备给 AI 读取的说明入口
+![AuraClaw Cover](docs/assets/github-cover.svg)
 
-一句话说，AuraClaw 的交付层级是：
+> AuraClaw 不是教程堆积站，也不是 Prompt 市场。  
+> 它更像一套围绕 OpenClaw 运行的经验发布系统：前台承载经验包与 7 天学习路径，后台负责审核发布，本地侦察兵持续供稿。
 
-`经验包 > skill > prompt`
+## About
 
-## 当前内容结构
+- 官网：[auraclaw.cc](https://auraclaw.cc)
+- 审核后台：[admin.auraclaw.cc/admin/login](https://admin.auraclaw.cc/admin/login)
+- 当前主叙事：`经验包` + `7 天学习路径`
+- 发布方式：`本地侦察兵 → 审核后台 → 人工确认 → 前台上线`
+- 面向对象：想真正把 OpenClaw 用起来的中文用户，而不是只想收藏提示词的人
 
-目前产品按 4 个板块组织：
+## 这个项目在做什么
 
-- `产后护理`
-  先帮用户拿到第一个结果，低风险、高结果感、适合新手起步。
-- `能力扩展`
-  告诉用户什么时候该给 OpenClaw 接上新的能力，比如抓取增强、仓库接入、外部工具。
-- `对话训练`
-  把模糊说法收成 OpenClaw 真能执行的任务结构，训练用户自己的表达逻辑。
-- `一人公司（OPC）`
-  把单点能力接成完整工作骨架，服务更进阶的一人公司和 multi-agent 场景。
+AuraClaw 的核心不是“多收录一点内容”，而是把一件已经跑通的事，整理成别人复制过去也能做成的版本。
 
-## 当前原型里已经有的东西
+当前项目重点放在两条主线：
 
-- 一个可运行的前端原型站点
-- 首页的人类 / AI 入口分流
-- `skill.md` 作为给 AI 读取的入口文件
-- 经验包详情页
-- Starter Pack 起步页
-- 基于当前主控文档整理出的产品文案和内容结构
+| 主线 | 说明 |
+| --- | --- |
+| 经验包 | 把多个 skill、接入步骤、验证方法和回退方案整理成可执行工作流 |
+| 7 天学习路径 | 给第一次接触 OpenClaw 的用户一个清晰顺序，先建立理解，再决定往哪里深入 |
 
-## 经验包是什么
+支撑这两条主线的，是后台审核和本地侦察兵：
 
-AuraClaw 的最小内容单位叫 `经验包`。
+| 支撑层 | 作用 |
+| --- | --- |
+| 审核后台 | 管理候选内容、去重、批准、发布、撤回和排序 |
+| AuraClaw 侦察兵 | 在本地由 OpenClaw 托管运行，持续抓取新来源并投递到审核后台 |
 
-一个合格的经验包，不应该只是一段 Prompt，而应该尽量包含：
+## 为什么会有 AuraClaw
 
-- 它到底能帮用户做成什么
-- 开始前要准备什么
-- 可能要用到什么 skill / 仓库 / 外部能力
-- 来源在哪里
-- 怎么安装或接入
-- 怎么验证是否成功
-- 失败后怎么回退
-- 装好以后用户最短应该怎么说
+很多人刚开始用 OpenClaw 时，卡住的不是“模型不够强”，而是：
 
-目标是让用户复制给自己的 OpenClaw 后，它能尽量复现这段经验，而不是只收到一句空泛指令。
+- 不知道第一件该做什么
+- 不知道该装什么 skill、去哪里拿、怎么验证是否真的接通
+- 看过很多教程，但复制过去之后还是跑不动
+- 偶然刷到一个关键经验时会瞬间通关，没刷到就会一直在死胡同里打转
 
-## 本地运行
+AuraClaw 想解决的就是这件事：
+
+- 把零散经验收成结构化经验包
+- 把“会的人脑内流程”变成“普通人可复现流程”
+- 让 OpenClaw 的正确做法可以被继承，而不是每个人都从头踩坑
+
+## 项目结构
+
+```mermaid
+flowchart LR
+    S["本地侦察兵<br/>OpenClaw 托管脚本"] --> H["候选收件箱<br/>harvest inbox"]
+    H --> A["审核后台<br/>登录 / 去重 / 审核 / 发布"]
+    A --> P["发布产物<br/>published JSON"]
+    P --> W["前台网站<br/>经验包 / 7 天学习路径"]
+    W --> U["人类用户与 OpenClaw 用户"]
+```
+
+这个链路的关键点不是“全自动”，而是“可持续地半自动”：
+
+- 侦察兵负责发现素材
+- 后台负责把素材收进可审状态
+- 人工负责最后判断什么值得上线
+- 前台只展示真正筛过的一层结果
+
+## 仓库重点目录
+
+| 路径 | 说明 |
+| --- | --- |
+| `src/` | 前台 React + TypeScript 应用，包含首页、经验包、学习路径、来源页和后台入口 |
+| `server/review-api.mjs` | 审核后台 API，处理登录、候选读取、发布、撤回与 intake 上传 |
+| `public/skill.md` | 给 OpenClaw / AI 使用的网站操作手册 |
+| `scripts/source-scout.py` | AuraClaw 侦察兵主脚本，用于抓取、筛选并投递候选内容 |
+| `deploy/` | 生产部署相关配置，包括 PM2 与 Nginx |
+| `docs/` | 阿里云部署、侦察兵运维、OpenClaw 交接提示词等中文说明 |
+
+## 当前运行方式
+
+### 前台
+
+- 面向访问者展示经验包和学习路径
+- 当前体验地址：[auraclaw.cc](https://auraclaw.cc)
+
+### 审核后台
+
+- 负责审核、发布、撤回、排序和候选状态管理
+- 当前入口：[admin.auraclaw.cc/admin/login](https://admin.auraclaw.cc/admin/login)
+
+### 本地侦察兵
+
+- 不跑在云端，而是跑在本地电脑
+- 由 OpenClaw 管理执行
+- 定期抓取来源，整理为候选内容，再安全投递到审核后台
+
+这也是 AuraClaw 和很多“纯站点项目”不一样的地方：  
+它不是一个静态内容站，而是一条持续产出内容的运营链路。
+
+## 快速开始
+
+### 1. 安装依赖
 
 ```bash
 npm install
+```
+
+### 2. 启动本地前后端
+
+```bash
 npm run dev
 ```
 
-默认开发地址：
+默认会同时启动：
 
-`http://localhost:5173/`
+- 前台开发环境：`http://localhost:5173`
+- 审核 API：`http://localhost:5174`
 
-生产构建：
+### 3. 构建生产版本
 
 ```bash
 npm run build
 ```
 
-## 仓库结构
+### 4. 本地启动审核服务
 
-```text
-auraclaw/
-├── docs/          当前主控文档、版本索引、历史归档
-├── public/        静态资源与 skill.md
-├── src/           前端页面、组件与数据
-├── content/       内容模板
-├── DESIGN.md      当前设计演化记录
-└── README.md
+```bash
+npm start
 ```
 
-## 先看哪里
+### 5. 生成部署打包文件
 
-如果你第一次接手这个项目，建议按这个顺序看：
+```bash
+npm run bundle:deploy
+```
 
-1. [docs/AuraClaw_主控文档.md](./docs/AuraClaw_主控文档.md)
-2. [docs/AuraClaw_版本索引与项目地图.md](./docs/AuraClaw_版本索引与项目地图.md)
-3. [src/pages/HomePage.tsx](./src/pages/HomePage.tsx)
-4. [src/data.ts](./src/data.ts)
+## 文档入口
 
-## 当前阶段
+- [AuraClaw 阿里云部署说明](docs/AuraClaw_阿里云部署说明.md)
+- [AuraClaw 侦察兵 v5.3 运维说明](docs/AuraClaw_侦察兵_v5.3运维说明.md)
+- [OpenClaw 部署与运维交接提示词](docs/OpenClaw_部署与运维交接提示词.md)
+- [OpenClaw 阿里云部署提示词](docs/OpenClaw_阿里云部署提示词.md)
 
-这个仓库目前还是原型阶段，但首页、导航、品牌视觉和核心经验包结构已经进入可持续迭代状态。
+## 当前定位
 
-接下来的重点不是继续堆功能，而是：
+AuraClaw 现在不是要做“最大的 OpenClaw 内容站”，而是要做：
 
-- 把经验包继续做深
-- 把内容来源和引用机制做稳
-- 让“复制给 OpenClaw”的内容真正足够可执行
-- 在不增加理解成本的前提下，把产品感继续收紧
+- 更像成品的经验包前台
+- 更轻但可用的审核发布后台
+- 更稳定的本地侦察兵供稿链路
+- 更适合中文用户和 OpenClaw 一起使用的经验系统
+
+如果你也在做 AI Agent 产品、知识产品或人机协作工作流，这个项目最值得看的不是页面本身，而是这条链路：
+
+`侦察兵发现 → 人工审核 → 经验包发布 → 用户复制执行 → 再回到下一轮整理`
